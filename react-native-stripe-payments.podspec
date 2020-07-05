@@ -7,22 +7,17 @@ Pod::Spec.new do |s|
   s.version      = package["version"]
   s.summary      = package["description"]
   s.description  = <<-DESC
-                  react-native-stripe-payments
+                   A well typed React Native library providing support for Stripe payments on both iOS and Android.
                    DESC
-  s.homepage     = "https://github.com/github_account/react-native-stripe-payments"
-  # brief license entry:
-  s.license      = "MIT"
-  # optional - use expanded license entry instead:
-  # s.license    = { :type => "MIT", :file => "LICENSE" }
-  s.authors      = { "Your Name" => "yourname@email.com" }
+  s.homepage     = "https://github.com/Fitpassu/react-native-stripe-payments"
+  s.license    = { :type => "MIT", :file => "LICENSE" }
+  s.authors      = { "Viktoras Laukevičius" => "viktoras.laukevicius@yahoo.com" }
   s.platforms    = { :ios => "9.0" }
-  s.source       = { :git => "https://github.com/github_account/react-native-stripe-payments.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/Fitpassu/react-native-stripe-payments.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,c,m,swift}"
   s.requires_arc = true
 
   s.dependency "React"
-  # ...
-  # s.dependency "..."
 end
 

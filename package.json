@@ -2,7 +2,7 @@
   "name": "react-native-stripe-payments",
   "title": "React Native Stripe Payments",
   "version": "1.0.0",
-  "description": "TODO",
+  "description": "A well typed React Native library providing support for Stripe payments on both iOS and Android.",
   "main": "index.js",
   "files": [
     "README.md",
@@ -16,15 +16,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/github_account/react-native-stripe-payments.git",
-    "baseUrl": "https://github.com/github_account/react-native-stripe-payments"
+    "url": "git+https://github.com/Fitpassu/react-native-stripe-payments.git",
+    "baseUrl": "https://github.com/Fitpassu/react-native-stripe-payments"
   },
   "keywords": [
     "react-native"
   ],
   "author": {
-    "name": "Your Name",
-    "email": "yourname@email.com"
+    "name": "Viktoras Laukevičius",
+    "email": "viktoras.laukevicius@yahoo.com"
   },
   "license": "MIT",
   "licenseFilename": "LICENSE",
@@ -35,6 +35,6 @@
   },
   "devDependencies": {
     "react": "^16.9.0",
-    "react-native": "^0.61.5"
+    "react-native": ">=0.60"
   }
 }

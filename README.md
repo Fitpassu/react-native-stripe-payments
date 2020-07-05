@@ -1,17 +1,31 @@
-# react-native-stripe-payments
+![React Native Stripe payments](https://raw.githubusercontent.com/Fitpassu/react-native-stripe-payments/master/react-native-stripe-payments.png)
+
+A well typed React Native library providing support for Stripe payments on both iOS and Android.
+
+# React Native Stripe payments
 
 ## Getting started
 
-`$ npm install react-native-stripe-payments --save`
+> Starting September 14, 2019 new payments regulation is being rolled out in Europe, which mandates Strong Customer Authentication (SCA) for many online payments in the European Economic Area (EEA). SCA is part of the second Payment Services Directive (PSD2).
 
-### Mostly automatic installation
+This library provides simple way to integrate SCA compliant Stripe payments into your react native app with a first class Typescript support.
 
-`$ react-native link react-native-stripe-payments`
+### Installation
+
+`$ yarn add react-native-stripe-payments`
 
 ## Usage
-```javascript
-import StripePayments from 'react-native-stripe-payments';
 
-// TODO: What to do with the module?
-StripePayments;
-```
+### Setup
+
+First of all you have to obtain Stripe account [https://stripe.com/docs/keys](publishabe key).
+
+Docs TBD
+
+### One-time payments
+
+Docs TBD
+
+### Reusing cards
+
+Not supported yet, though as we're highly invested in development of our product which depends on this library we'll do it as soon as possible!
