@@ -14,11 +14,13 @@ This library provides simple way to integrate SCA compliant Stripe payments into
 
 `$ yarn add react-native-stripe-payments`
 
+The library ships with platform native code that needs to be compiled together with React Native. This requires you to configure your build tools which can be done with [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md)
+
 ## Usage
 
 ### Setup
 
-First of all you have to obtain Stripe account [https://stripe.com/docs/keys](publishabe key).
+First of all you have to obtain Stripe account [publishabe key](https://stripe.com/docs/keys).
 
 Docs TBD
 
