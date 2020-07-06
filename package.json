@@ -8,7 +8,7 @@
   "files": [
     "README.md",
     "android",
-    "index.js",
+    "build/**/*",
     "ios",
     "react-native-stripe-payments.podspec"
   ],
@@ -22,7 +22,15 @@
     "baseUrl": "https://github.com/Fitpassu/react-native-stripe-payments"
   },
   "keywords": [
-    "react-native"
+    "react-native",
+    "stripe",
+    "payments",
+    "sca",
+    "strong customer authentication",
+    "android",
+    "ios",
+    "payment intents",
+    "cross platform"
   ],
   "author": {
     "name": "Viktoras Laukevičius",
