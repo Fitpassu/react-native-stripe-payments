@@ -18,11 +18,6 @@ export interface PaymentResult {
   paymentMethodId: string,
 }
 
-export interface StripeError {
-  status: string;
-  message: string;
-}
-
 class Stripe {
   _stripeInitialized = false
 
