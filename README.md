@@ -13,6 +13,7 @@ This library provides simple way to integrate SCA compliant Stripe payments into
 ### Installation
 
 `$ yarn add react-native-stripe-payments`
+
 `$ npx react-native link react-native-stripe-payments`
 
 The library ships with platform native code that needs to be compiled together with React Native. This requires you to configure your build tools which can be done with [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md).
@@ -21,13 +22,46 @@ The library ships with platform native code that needs to be compiled together w
 
 ### Setup
 
-First of all you have to obtain Stripe account [publishabe key](https://stripe.com/docs/keys).
+First of all you have to obtain Stripe account [publishabe key](https://stripe.com/docs/keys). And then you need to set it for module.
 
-Docs TBD
+```javascript
+import stripe from 'react-native-stripe-payments';
+
+stripe.setOptions({ publishingKey: 'STRIPE_PUBLISHING_KEY' });
+```
+
+### Validate the given card details
+
+```javascript
+import stripe from 'react-native-stripe-payments';
+
+const isCardValid = stripe.isCardValid({
+  number: '4242424242424242',
+  expMonth: 10,
+  expYear: 21,
+  cvc: '888',
+});
+```
 
 ### One-time payments
 
-Docs TBD
+```javascript
+import stripe from 'react-native-stripe-payments';
+
+const cardDetails = {
+  number: '4242424242424242',
+  expMonth: 10,
+  expYear: 21,
+  cvc: '888',
+}
+stripe.confirmPayment('client_secret_from_backend', cardDetails)
+  .then(result => {
+    // result of type PaymentResult
+  })
+  .catch(err =>
+    // error performing payment
+  )
+```
 
 ### Reusing cards
 
