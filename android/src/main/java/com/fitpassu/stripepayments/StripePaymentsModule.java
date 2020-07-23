@@ -54,7 +54,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
 
     @Override
     public String getName() {
-        return "StripePaymentsModule";
+        return "StripePayments";
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
