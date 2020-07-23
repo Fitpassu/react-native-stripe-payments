@@ -35,6 +35,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
             if (paymentPromise == null || stripe == null) {
                 super.onActivityResult(activity, requestCode, resultCode, data);
+                return;
             }
             boolean handled = stripe.onPaymentResult(requestCode, data, new PaymentResultCallback(paymentPromise));
             if (!handled) {
