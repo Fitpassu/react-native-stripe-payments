@@ -3,7 +3,8 @@ import { NativeModules } from 'react-native';
 const { StripePayments } = NativeModules;
 
 export interface InitParams {
-  publishingKey: string
+  publishingKey: string,
+  stripeAccount: string,
 }
 
 export interface CardDetails {
@@ -19,13 +20,13 @@ export interface PaymentResult {
 }
 
 class Stripe {
-  _stripeInitialized = false
+  _stripeInitialized = false;
 
   setOptions = (options: InitParams) => {
     if (this._stripeInitialized) { return; }
-    StripePayments.init(options.publishingKey);
+    StripePayments.init(options.publishingKey, options.stripeAccount);
     this._stripeInitialized = true;
-  }
+  };
 
   confirmPayment(clientSecret: string, cardDetails: CardDetails): Promise<PaymentResult> {
     return StripePayments.confirmPayment(clientSecret, cardDetails)
