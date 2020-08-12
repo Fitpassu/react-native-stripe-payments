@@ -58,10 +58,11 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
-    public void init(String publishableKey) {
+    public void init(String publishableKey, String stripeAccount) {
         PaymentConfiguration.init(
                 reactContext,
-                publishableKey
+                publishableKey,
+                stripeAccount
         );
     }
 
