@@ -54,7 +54,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
 
     @Override
     public String getName() {
-        return "StripePaymentsModule";
+        return "StripePayments";
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
@@ -99,7 +99,8 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
         paymentPromise = promise;
         stripe = new Stripe(
                 reactContext,
-                PaymentConfiguration.getInstance(reactContext).getPublishableKey()
+                PaymentConfiguration.getInstance(reactContext).getPublishableKey(),
+                PaymentConfiguration.getInstance(reactContext).getStripeAccountId()
         );
         stripe.confirmPayment(getCurrentActivity(), confirmParams);
     }
