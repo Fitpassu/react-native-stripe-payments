@@ -9,16 +9,16 @@ Pod::Spec.new do |s|
   s.description  = <<-DESC
                    Lightweight, easy to integrate and use React native library for Stripe payments (using Payment Intents) compliant with SCA (strong customer authentication).
                    DESC
-  s.homepage     = "https://github.com/Fitpassu/react-native-stripe-payments"
+  s.homepage     = "https://github.com/gooapps/react-native-stripe-payments"
   s.license    = { :type => "MIT", :file => "LICENSE" }
   s.authors      = { "Viktoras Laukevičius" => "viktoras.laukevicius@yahoo.com" }
   s.platforms    = { :ios => "11.0" }
-  s.source       = { :git => "https://github.com/Fitpassu/react-native-stripe-payments.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/gooapps/react-native-stripe-payments.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,c,m,swift}"
   s.requires_arc = true
 
   s.dependency "React"
-  s.dependency "Stripe", "~> 19.0"
+  s.dependency "Stripe", "~> 19.3"
 end
 

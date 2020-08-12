@@ -19,8 +19,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Fitpassu/react-native-stripe-payments.git",
-    "baseUrl": "https://github.com/Fitpassu/react-native-stripe-payments"
+    "url": "git+https://github.com/gooapps/react-native-stripe-payments.git",
+    "baseUrl": "https://github.com/gooapps/react-native-stripe-payments"
   },
   "keywords": [
     "react-native",

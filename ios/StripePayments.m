@@ -6,9 +6,10 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(init:(NSString *)publishableKey)
+RCT_EXPORT_METHOD(init:(NSString *)publishableKey,(NSString *)stripeAccount)
 {
     [Stripe setDefaultPublishableKey:publishableKey];
+    [STPAPIClient sharedClient] setStripeAccount:stripeAccount];
 }
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(isCardValid:(NSDictionary *)cardParams)
