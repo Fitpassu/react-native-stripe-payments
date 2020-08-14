@@ -21,6 +21,13 @@ import com.stripe.android.model.Card;
 import com.stripe.android.model.ConfirmPaymentIntentParams;
 import com.stripe.android.model.PaymentIntent;
 import com.stripe.android.model.PaymentMethodCreateParams;
+import com.stripe.android.model.SetupIntent;
+import com.stripe.android.SetupIntentResult;
+import com.stripe.android.model.ConfirmSetupIntentParams;
+import com.stripe.android.model.PaymentMethod;
+import com.stripe.android.model.PaymentMethod.BillingDetails;
+
+
 
 public class StripePaymentsModule extends ReactContextBaseJavaModule {
 
@@ -135,4 +142,62 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
             promise.reject("StripeModule.failed", e.toString());
         }
     }
+
+    @ReactMethod
+    public void setupCard(String secret, ReadableMap cardParams, final Promise promise) {
+        PaymentMethodCreateParams.Card card = new PaymentMethodCreateParams.Card(
+                cardParams.getString("number"),
+                cardParams.getInt("expMonth"),
+                cardParams.getInt("expYear"),
+                cardParams.getString("cvc"),
+                null,
+                null
+        );
+        PaymentMethod.BillingDetails billingDetails = (new PaymentMethod.BillingDetails.Builder()).setEmail(cardParams.getString("email")).build();
+        // PaymentMethodCreateParams params = PaymentMethodCreateParams.create(card);
+        PaymentMethodCreateParams paymentMethodParams = PaymentMethodCreateParams.create(card, billingDetails);
+
+        ConfirmSetupIntentParams confirmParams = ConfirmSetupIntentParams.create(paymentMethodParams, secret);
+
+
+        if (params == null) {
+            promise.reject("", "StripeModule.invalidSetupIntentParams");
+            return;
+        }
+
+        setupPromise = promise;
+        stripe = new Stripe(
+                reactContext,
+                PaymentConfiguration.getInstance(reactContext).getPublishableKey()
+        );
+        stripe.confirmSetupIntent(this, confirmParams);
+
+    }
+
+    private static final class PaymentResultCallback implements ApiResultCallback<SetupIntentResult> {
+        private final Promise promise;
+
+        PaymentResultCallback(Promise promise) {
+            this.promise = promise;
+        }
+
+        @Override
+        public void onSuccess(SetupIntentResult result) {
+            SetupIntent setupIntent = result.getIntent();
+            SetupIntent.Status status = setupIntent.getStatus();
+
+            if (
+                    status == SetupIntent.Status.Succeeded ||
+                    status == SetupIntent.Status.Processing
+            ) {
+                WritableMap map = Arguments.createMap();
+                map.putString("id", setupIntent.getId());
+                map.putString("paymentMethodId", setupIntent.getPaymentMethodId());
+                promise.resolve(map);
+            } else if (status == SetupIntentResult.Status.Canceled) {
+                promise.reject("StripeModule.cancelled", "");
+            } else {
+                promise.reject("StripeModule.failed", status.toString());
+            }
+        }
 }
