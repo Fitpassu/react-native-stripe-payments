@@ -1,5 +1,7 @@
 package com.fitpassu.stripepayments;
 
+import java.lang.String;
+
 import android.app.Activity;
 import android.content.Intent;
 
@@ -27,8 +29,9 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
     private static ReactApplicationContext reactContext;
 
     private Stripe stripe;
-    private Promise paymentPromise;
-
+    private Promise paymentPromise, setupPromise;
+    private String current;
+    // boolean handled
     private final ActivityEventListener activityListener = new BaseActivityEventListener() {
 
         @Override
@@ -37,8 +40,13 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
                 super.onActivityResult(activity, requestCode, resultCode, data);
                 return;
             }
+            if(current.equals("Payment")){
             boolean handled = stripe.onPaymentResult(requestCode, data, new PaymentResultCallback(paymentPromise));
-            if (!handled) {
+            }else{
+                // boolean handled = stripe.onSetupResult(requestCode, data, new SetupResultCallback(paymentPromise));
+            }
+
+if (!handled) {
                 super.onActivityResult(activity, requestCode, resultCode, data);
             }
         }
@@ -135,4 +143,65 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
             promise.reject("StripeModule.failed", e.toString());
         }
     }
+    //     @ReactMethod
+    // public void setupCard(String secret, ReadableMap cardParams, final Promise promise) {
+    //     PaymentMethodCreateParams.Card card = new PaymentMethodCreateParams.Card(
+    //             cardParams.getString("number"),
+    //             cardParams.getInt("expMonth"),
+    //             cardParams.getInt("expYear"),
+    //             cardParams.getString("cvc"),
+    //             null,
+    //             null
+    //     );
+    //     PaymentMethod.BillingDetails billingDetails = (new PaymentMethod.BillingDetails.Builder()).setEmail(cardParams.getString("email")).build();
+    //     // PaymentMethodCreateParams params = PaymentMethodCreateParams.create(card);
+    //     PaymentMethodCreateParams params = PaymentMethodCreateParams.create(card, billingDetails);
+
+    //     ConfirmSetupIntentParams confirmParams = ConfirmSetupIntentParams.create(params, secret);
+
+
+    //     if (params == null) {
+    //         promise.reject("", "StripeModule.invalidSetupIntentParams");
+    //         return;
+    //     }
+
+    //     setupPromise = promise;
+    //     stripe = new Stripe(
+    //             reactContext,
+    //             PaymentConfiguration.getInstance(reactContext).getPublishableKey()
+    //     );
+    //     stripe.confirmSetupIntent(getCurrentActivity(), confirmParams);
+
+    // }
+    // private static final class SetupResultCallback implements ApiResultCallback<SetupIntentResult> {
+    //     private final Promise promise;
+
+    //     SetupResultCallback(Promise promise) {
+    //         this.promise = promise;
+    //     }
+
+    //     @Override
+    //     public void onSuccess(SetupIntentResult result) {
+    //         SetupIntent setupIntent = result.getIntent();
+    //         SetupIntent.Status status = setupIntent.getStatus();
+
+    //         if (
+    //                 status == SetupIntent.Status.Succeeded ||
+    //                 status == SetupIntent.Status.Processing
+    //         ) {
+    //             WritableMap map = Arguments.createMap();
+    //             map.putString("id", setupIntent.getId());
+    //             map.putString("paymentMethodId", setupIntent.getPaymentMethodId());
+    //             promise.resolve(map);
+    //         } else if (status == SetupIntent.Status.Canceled) {
+    //             promise.reject("StripeModule.cancelled", "");
+    //         } else {
+    //             promise.reject("StripeModule.failed", status.toString());
+    //         }
+    //     }
+    //     @Override
+    //     public void onError(Exception e) {
+    //         promise.reject("StripeModule.failed", e.toString());
+    //     }
+    // }
 }
