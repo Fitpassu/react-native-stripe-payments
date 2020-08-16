@@ -93,6 +93,7 @@ if (!handled){
 
     @ReactMethod
     public void confirmPayment(String secret, ReadableMap cardParams, final Promise promise) {
+        
         PaymentMethodCreateParams.Card card = new PaymentMethodCreateParams.Card(
                 cardParams.getString("number"),
                 cardParams.getInt("expMonth"),
@@ -151,13 +152,14 @@ if (!handled){
     }
         @ReactMethod
     public void setupCard(String secret, ReadableMap cardParams, final Promise promise) {
+        current = "Setup";
         PaymentMethodCreateParams.Card card = new PaymentMethodCreateParams.Card(
                 cardParams.getString("number"),
                 cardParams.getInt("expMonth"),
                 cardParams.getInt("expYear"),
                 cardParams.getString("cvc"),
                 null,
-                null
+                nul
         );
         PaymentMethod.BillingDetails billingDetails = (new PaymentMethod.BillingDetails.Builder()).setEmail(cardParams.getString("email")).build();
         // PaymentMethodCreateParams params = PaymentMethodCreateParams.create(card);
