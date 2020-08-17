@@ -11,10 +11,16 @@ export interface PaymentResult {
     id: string;
     paymentMethodId: string;
 }
+export interface SetupIntentResult {
+    id: string;
+    paymentMethodId: string;
+    liveMode: boolean;
+}
 declare class Stripe {
     _stripeInitialized: boolean;
     setOptions: (options: InitParams) => void;
-    confirmPayment(clientSecret: string, cardDetails: CardDetails): Promise<PaymentResult>;
+    confirmPayment(clientSecret: string, cardDetails: CardDetails, createWithCardParams: boolean): Promise<PaymentResult>;
+    confirmSetup(clientSecret: string, cardDetails: CardDetails): Promise<SetupIntentResult>;
     isCardValid(cardDetails: CardDetails): boolean;
 }
 declare const _default: Stripe;

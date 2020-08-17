@@ -17,6 +17,11 @@ export interface PaymentResult {
   id: string,
   paymentMethodId: string,
 }
+export interface SetupIntentResult {
+  id: string,
+  paymentMethodId: string,
+  liveMode: boolean
+}
 
 class Stripe {
   _stripeInitialized = false
@@ -27,8 +32,11 @@ class Stripe {
     this._stripeInitialized = true;
   }
 
-  confirmPayment(clientSecret: string, cardDetails: CardDetails): Promise<PaymentResult> {
-    return StripePayments.confirmPayment(clientSecret, cardDetails)
+  confirmPayment(clientSecret: string, cardDetails: CardDetails, createWithCardParams: boolean): Promise<PaymentResult> {
+    return StripePayments.confirmPayment(clientSecret, cardDetails, createWithCardParams)
+  }
+  confirmSetup(clientSecret: string, cardDetails: CardDetails): Promise<SetupIntentResult>{
+    return StripePayments.confirmSetup(clientSecret, cardDetails)
   }
 
   isCardValid(cardDetails: CardDetails): boolean {

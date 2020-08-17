@@ -12,8 +12,11 @@ var Stripe = /** @class */ (function () {
             _this._stripeInitialized = true;
         };
     }
-    Stripe.prototype.confirmPayment = function (clientSecret, cardDetails) {
-        return StripePayments.confirmPayment(clientSecret, cardDetails);
+    Stripe.prototype.confirmPayment = function (clientSecret, cardDetails, createWithCardParams) {
+        return StripePayments.confirmPayment(clientSecret, cardDetails, createWithCardParams);
+    };
+    Stripe.prototype.confirmSetup = function (clientSecret, cardDetails) {
+        return StripePayments.confirmSetup(clientSecret, cardDetails);
     };
     Stripe.prototype.isCardValid = function (cardDetails) {
         return StripePayments.isCardValid(cardDetails) == true;

@@ -13,10 +13,7 @@ import com.facebook.react.uimanager.ViewManager;
 public class StripePaymentsPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        List<NativeModule> modules = new ArrayList<>();
-        modules.add(new StripePaymentsModule(reactContext));
-        // modules.add(new StripeSetupModule(reactContext));
-        return modules;
+        return Arrays.<NativeModule>asList(new StripePaymentsModule(reactContext));
     }
 
     @Override

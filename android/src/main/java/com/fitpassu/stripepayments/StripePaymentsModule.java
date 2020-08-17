@@ -36,23 +36,25 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
 
     private Stripe stripe;
     private Promise paymentPromise, setupPromise;
-    private String current;
-    // boolean handled
+    private String current= " temp_val";
+    
+    boolean handled;
     private final ActivityEventListener activityListener = new BaseActivityEventListener() {
 
         @Override
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-            if (paymentPromise == null || stripe == null) {
+            if ((paymentPromise == null && setupPromise == null) || stripe == null) {
                 super.onActivityResult(activity, requestCode, resultCode, data);
                 return;
             }
+            
             if(current.equals("Payment")){
-            boolean handled = stripe.onPaymentResult(requestCode, data, new PaymentResultCallback(paymentPromise));
-            }else{
-                boolean handled = stripe.onSetupResult(requestCode, data, new SetupResultCallback(paymentPromise));
+            handled = stripe.onPaymentResult(requestCode, data, new PaymentResultCallback(paymentPromise));
+            }else if(current.equals("Setup")){
+                 handled = stripe.onSetupResult(requestCode, data, new SetupResultCallback(setupPromise));
             }
 
-if (!handled){
+            if (!handled){
                 super.onActivityResult(activity, requestCode, resultCode, data);
             }
         }
@@ -68,7 +70,7 @@ if (!handled){
 
     @Override
     public String getName() {
-        return "StripePaymentsModule";
+        return "StripePayments";
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
@@ -92,8 +94,13 @@ if (!handled){
     }
 
     @ReactMethod
-    public void confirmPayment(String secret, ReadableMap cardParams, final Promise promise) {
-        
+    public void confirmPayment(String secret, ReadableMap cardParams, boolean createCardWithParams, final Promise promise) {
+        current = "Payment";
+        stripe = new Stripe(
+                reactContext,
+                PaymentConfiguration.getInstance(reactContext).getPublishableKey()
+        );
+        if(createCardWithParams){
         PaymentMethodCreateParams.Card card = new PaymentMethodCreateParams.Card(
                 cardParams.getString("number"),
                 cardParams.getInt("expMonth"),
@@ -111,11 +118,24 @@ if (!handled){
         }
 
         paymentPromise = promise;
-        stripe = new Stripe(
-                reactContext,
-                PaymentConfiguration.getInstance(reactContext).getPublishableKey()
-        );
+        
         stripe.confirmPayment(getCurrentActivity(), confirmParams);
+        }else{
+
+        if (cardParams.getString("payment_method") == null) {
+            promise.reject("", "StripeModule.invalidPaymentIntentParams");
+            return;
+        }
+        paymentPromise = promise;
+
+            stripe.confirmPayment(
+            getCurrentActivity(),
+            ConfirmPaymentIntentParams.createWithPaymentMethodId(
+                cardParams.getString("payment_method"),
+                secret
+                )
+            );
+        }
     }
 
     private static final class PaymentResultCallback implements ApiResultCallback<PaymentIntentResult> {
@@ -141,7 +161,7 @@ if (!handled){
             } else if (status == PaymentIntent.Status.Canceled) {
                 promise.reject("StripeModule.cancelled", "");
             } else {
-                promise.reject("StripeModule.failed", status.toString());
+                promise.reject("StripeModule.failed", paymentIntent.getLastPaymentError().getMessage());
             }
         }
 
@@ -151,27 +171,31 @@ if (!handled){
         }
     }
         @ReactMethod
-    public void setupCard(String secret, ReadableMap cardParams, final Promise promise) {
+    public void confirmSetup(String secret, ReadableMap cardParams, final Promise promise) {
         current = "Setup";
         PaymentMethodCreateParams.Card card = new PaymentMethodCreateParams.Card(
                 cardParams.getString("number"),
-                cardParams.getInt("expMonth"),
-                cardParams.getInt("expYear"),
+                cardParams.getInt("exp_month"),
+                cardParams.getInt("exp_year"),
                 cardParams.getString("cvc"),
                 null,
-                nul
+                null
         );
         PaymentMethod.BillingDetails billingDetails = (new PaymentMethod.BillingDetails.Builder()).setEmail(cardParams.getString("email")).build();
         // PaymentMethodCreateParams params = PaymentMethodCreateParams.create(card);
+        if(card == null){
+            promise.reject("", "StripeModule.invalidCardParams");
+            return;
+        }
         PaymentMethodCreateParams params = PaymentMethodCreateParams.create(card, billingDetails);
-
-        ConfirmSetupIntentParams confirmParams = ConfirmSetupIntentParams.create(params, secret);
-
 
         if (params == null) {
             promise.reject("", "StripeModule.invalidSetupIntentParams");
             return;
         }
+        ConfirmSetupIntentParams confirmParams = ConfirmSetupIntentParams.create(params, secret);
+
+
 
         setupPromise = promise;
         stripe = new Stripe(
@@ -204,7 +228,7 @@ if (!handled){
             } else if (status == SetupIntent.Status.Canceled) {
                 promise.reject("StripeModule.cancelled", "");
             } else {
-                promise.reject("StripeModule.failed", status.toString());
+                promise.reject("StripeModule.failed", setupIntent.getLastSetupError().getMessage());
             }
         }
         @Override
