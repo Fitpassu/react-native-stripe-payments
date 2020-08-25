@@ -22,16 +22,16 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(isCardValid:(NSDictionary *)cardParams)
     return [NSString stringWithFormat:@"%@", @(result)];
 }
 
-RCT_EXPORT_METHOD(setupPayment:(NSString *)clientSecret cardParams:(NSDictionary *)cardParams resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(confirmSetup:(NSString *)clientSecret cardParams:(NSDictionary *)cardParams resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-    if (cardParams.email
-        && cardParams.number
-        && cardParams.expMonth
-        && cardParams.expYear
-        && cardParams.cardCvc
-        && cardParams.postalCode
-        && clientSecret)
-    {
+//    if (cardParams.email
+//        && cardParams.number
+//        && cardParams.expMonth
+//        && cardParams.expYear
+//        && cardParams.cardCvc
+//        && cardParams.postalCode
+//        && clientSecret)
+//    {
         // Collect card params
         STPCardParams *card = [[STPCardParams alloc] init];
         card.number = [RCTConvert NSString:cardParams[@"number"]];
@@ -45,13 +45,14 @@ RCT_EXPORT_METHOD(setupPayment:(NSString *)clientSecret cardParams:(NSDictionary
         billingDetails.address.postalCode = [RCTConvert NSString:cardParams[@"postalCode"]];
         
         // Create SetupIntent confirm parameters with the above
-        STPPaymentMethodParams *paymentMethodParams = [STPPaymentMethodParams paramsWithCard:card billingDetails:billingDetails metadata:nil];
-        SSTPSetupIntentConfirmParams *setupIntentParams = [STPSetupIntentConfirmParams initWithClientSecret:clientSecret];
-        setupIntentParams.paymentMethodParams = paymentMethodParams;
+        STPPaymentMethodCardParams *paymentMethodCardParams =[[STPPaymentMethodCardParams alloc] initWithCardSourceParams:card];
+        STPPaymentMethodParams *paymentMethodParams = [STPPaymentMethodParams paramsWithCard:paymentMethodCardParams billingDetails:billingDetails metadata:nil];
+        STPSetupIntentConfirmParams *setupIntentConfirmParams = [[STPSetupIntentConfirmParams alloc] initWithClientSecret:clientSecret];
+        setupIntentConfirmParams.paymentMethodParams = paymentMethodParams;
         
         // Submit payment intent
         STPPaymentHandler *paymentHandler = [STPPaymentHandler sharedHandler];
-        [paymentHandler setupPayment:setupIntentConfirmParams withAuthenticationContext:self completion:^(STPPaymentHandlerActionStatus status, STPSetupIntent *setupIntent, NSError *error) {
+        [paymentHandler confirmSetupIntent:setupIntentConfirmParams withAuthenticationContext:self completion:^(STPPaymentHandlerActionStatus status, STPSetupIntent *setupIntent, NSError *error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 switch (status) {
                     case STPPaymentHandlerActionStatusFailed: {
@@ -64,12 +65,12 @@ RCT_EXPORT_METHOD(setupPayment:(NSString *)clientSecret cardParams:(NSDictionary
                     }
                     case STPPaymentHandlerActionStatusSucceeded: {
                         resolve(@{
-                            @"id": setupIntent.paymentMethodID,
-                            @"customer": setupIntent.customerID,
-                            @"liveMode": setupIntent.liveMode,
-                            @"last4": paymentMethodParams.last4,
-                            @"exp_month": paymentMethodParams.exp_month,
-                            @"exp_year": paymentMethodParams.exp_year
+                            @"id": [setupIntent paymentMethodID],
+                            @"customer": [setupIntent customerID],
+                            @"liveMode": @([setupIntent livemode]),
+                            @"last4": [[paymentMethodParams card] last4],
+                            @"exp_month": [[paymentMethodParams card] expMonth],
+                            @"exp_year": [[paymentMethodParams card] expYear]
                         });
                         break;
                     }
@@ -79,9 +80,9 @@ RCT_EXPORT_METHOD(setupPayment:(NSString *)clientSecret cardParams:(NSDictionary
                 }
             });
         }];
-    } else {
-        reject(@"StripeModule.failed", @"Insufficient card parameters", nil);
-    }
+//    } else {
+//        reject(@"StripeModule.failed", @"Insufficient card parameters", nil);
+//    }
 }
 
 RCT_EXPORT_METHOD(confirmPayment:(NSString *)secret cardParams:(NSDictionary *)cardParams resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
