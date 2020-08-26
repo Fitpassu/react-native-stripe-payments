@@ -60,18 +60,18 @@ var Stripe = /** @class */ (function () {
             _this._stripeInitialized = true;
         };
     }
-    Stripe.prototype.confirmPayment = function (clientSecret, cardDetails, createWithCardParams) {
-        return StripePayments.confirmPayment(clientSecret, cardDetails, createWithCardParams);
+    Stripe.prototype.confirmPayment = function (clientSecret, cardParams, createWithCardParams) {
+        return StripePayments.confirmPayment(clientSecret, cardParams, createWithCardParams);
     };
-    Stripe.prototype.confirmSetup = function (clientSecret, cardDetails) {
+    Stripe.prototype.confirmSetup = function (clientSecret, cardParams) {
         return __awaiter(this, void 0, void 0, function () {
             var nativeSetupIntentResult, cardNumber, cardType, brand;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, StripePayments.confirmSetup(clientSecret, cardDetails)];
+                    case 0: return [4 /*yield*/, StripePayments.confirmSetup(clientSecret, cardParams)];
                     case 1:
                         nativeSetupIntentResult = _a.sent();
-                        cardNumber = cardDetails.number;
+                        cardNumber = cardParams.number;
                         cardType = creditCardType(cardNumber);
                         brand = "";
                         if (cardType.length > 0) {

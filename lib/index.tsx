@@ -7,7 +7,7 @@ export interface InitParams {
   publishingKey: string
 }
 
-export interface CardDetails {
+export interface CardParams {
   number: string,
   expMonth: number,
   expYear: number,
@@ -36,13 +36,13 @@ class Stripe {
     this._stripeInitialized = true;
   }
 
-  confirmPayment(clientSecret: string, cardDetails: CardDetails, createWithCardParams: boolean): Promise<PaymentResult> {
-    return StripePayments.confirmPayment(clientSecret, cardDetails, createWithCardParams)
+  confirmPayment(clientSecret: string, cardParams: CardParams, createWithCardParams: boolean): Promise<PaymentResult> {
+    return StripePayments.confirmPayment(clientSecret, cardParams, createWithCardParams)
   }
 
-  async confirmSetup(clientSecret: string, cardDetails: CardDetails): Promise<SetupIntentResult>{
-    const nativeSetupIntentResult = await StripePayments.confirmSetup(clientSecret, cardDetails);
-    const cardNumber = cardDetails.number;
+  async confirmSetup(clientSecret: string, cardParams: CardParams): Promise<SetupIntentResult>{
+    const nativeSetupIntentResult = await StripePayments.confirmSetup(clientSecret, cardParams);
+    const cardNumber = cardParams.number;
     const cardType = creditCardType(cardNumber);
     let brand = "";
     if (cardType.length > 0) {
@@ -55,7 +55,7 @@ class Stripe {
     }
   }
 
-  isCardValid(cardDetails: CardDetails): boolean {
+  isCardValid(cardDetails: CardParams): boolean {
     return StripePayments.isCardValid(cardDetails) == true;
   }
 }

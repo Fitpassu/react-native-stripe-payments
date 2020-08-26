@@ -82,20 +82,28 @@ RCT_EXPORT_METHOD(confirmSetup:(NSString *)clientSecret cardParams:(NSDictionary
 
 }
 
-RCT_EXPORT_METHOD(confirmPayment:(NSString *)secret cardParams:(NSDictionary *)cardParams resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(confirmPayment:(NSString *)secret cardParams:(NSDictionary *)cardParams createWithCardParams:(BOOL)createWithCardParams resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-    // Collect card details
-    STPPaymentMethodCardParams *card = [[STPPaymentMethodCardParams alloc] init];
-    card.number = [RCTConvert NSString:cardParams[@"number"]];
-    card.expYear = [RCTConvert NSNumber:cardParams[@"expYear"]];
-    card.expMonth = [RCTConvert NSNumber:cardParams[@"expMonth"]];
-    card.cvc = [RCTConvert NSString:cardParams[@"cvc"]];
-    STPPaymentMethodParams *paymentMethodParams = [STPPaymentMethodParams paramsWithCard:card billingDetails:nil metadata:nil];
-    STPPaymentIntentParams *paymentIntentParams = [[STPPaymentIntentParams alloc] initWithClientSecret:secret];
-    paymentIntentParams.paymentMethodParams = paymentMethodParams;
-    paymentIntentParams.setupFutureUsage = @(STPPaymentIntentSetupFutureUsageOnSession);
+    STPPaymentIntentParams *paymentIntentParams;
+  
+    if (!createWithCardParams) {
+        // Creates the payment intent for 3D secure 2
+        paymentIntentParams = [[STPPaymentIntentParams alloc] initWithClientSecret:secret];
+        paymentIntentParams.paymentMethodId = [RCTConvert NSString:cardParams[@"payment_method"]];
+    } else {
+        // Collect card details
+        STPPaymentMethodCardParams *card = [[STPPaymentMethodCardParams alloc] init];
+        card.number = [RCTConvert NSString:cardParams[@"number"]];
+        card.expYear = [RCTConvert NSNumber:cardParams[@"expYear"]];
+        card.expMonth = [RCTConvert NSNumber:cardParams[@"expMonth"]];
+        card.cvc = [RCTConvert NSString:cardParams[@"cvc"]];
+        STPPaymentMethodParams *paymentMethodParams = [STPPaymentMethodParams paramsWithCard:card billingDetails:nil metadata:nil];
+        paymentIntentParams = [[STPPaymentIntentParams alloc] initWithClientSecret:secret];
+        paymentIntentParams.paymentMethodParams = paymentMethodParams;
+        paymentIntentParams.setupFutureUsage = @(STPPaymentIntentSetupFutureUsageOnSession);
+    }
 
-    // Submit the payment
+    // Submit the payment intent
     STPPaymentHandler *paymentHandler = [STPPaymentHandler sharedHandler];
     [paymentHandler confirmPayment:paymentIntentParams withAuthenticationContext:self completion:^(STPPaymentHandlerActionStatus status, STPPaymentIntent *paymentIntent, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{

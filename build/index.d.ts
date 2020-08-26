@@ -1,7 +1,7 @@
 export interface InitParams {
     publishingKey: string;
 }
-export interface CardDetails {
+export interface CardParams {
     number: string;
     expMonth: number;
     expYear: number;
@@ -21,9 +21,9 @@ export interface SetupIntentResult {
 declare class Stripe {
     _stripeInitialized: boolean;
     setOptions: (options: InitParams) => void;
-    confirmPayment(clientSecret: string, cardDetails: CardDetails, createWithCardParams: boolean): Promise<PaymentResult>;
-    confirmSetup(clientSecret: string, cardDetails: CardDetails): Promise<SetupIntentResult>;
-    isCardValid(cardDetails: CardDetails): boolean;
+    confirmPayment(clientSecret: string, cardParams: CardParams, createWithCardParams: boolean): Promise<PaymentResult>;
+    confirmSetup(clientSecret: string, cardParams: CardParams): Promise<SetupIntentResult>;
+    isCardValid(cardDetails: CardParams): boolean;
 }
 declare const _default: Stripe;
 export default _default;
