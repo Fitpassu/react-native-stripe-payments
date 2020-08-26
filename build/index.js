@@ -1,4 +1,16 @@
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 import { NativeModules } from 'react-native';
+import creditCardType from 'credit-card-type';
 var StripePayments = NativeModules.StripePayments;
 var Stripe = /** @class */ (function () {
     function Stripe() {
@@ -16,7 +28,14 @@ var Stripe = /** @class */ (function () {
         return StripePayments.confirmPayment(clientSecret, cardDetails, createWithCardParams);
     };
     Stripe.prototype.confirmSetup = function (clientSecret, cardDetails) {
-        return StripePayments.confirmSetup(clientSecret, cardDetails);
+        var nativeSetupIntentResult = StripePayments.confirmSetup(clientSecret, cardDetails);
+        var cardNumber = cardDetails.number;
+        var cardType = creditCardType(cardNumber);
+        var brand = "";
+        if (cardType.length > 0) {
+            brand = cardType[0].type;
+        }
+        return __assign(__assign({}, nativeSetupIntentResult), { brand: brand });
     };
     Stripe.prototype.isCardValid = function (cardDetails) {
         return StripePayments.isCardValid(cardDetails) == true;

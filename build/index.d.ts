@@ -12,9 +12,11 @@ export interface PaymentResult {
     paymentMethodId: string;
 }
 export interface SetupIntentResult {
-    id: string;
     paymentMethodId: string;
     liveMode: boolean;
+    last4: string;
+    created: number;
+    brand: string;
 }
 declare class Stripe {
     _stripeInitialized: boolean;
