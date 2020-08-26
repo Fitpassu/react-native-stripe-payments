@@ -39,9 +39,9 @@ class Stripe {
   confirmPayment(clientSecret: string, cardDetails: CardDetails, createWithCardParams: boolean): Promise<PaymentResult> {
     return StripePayments.confirmPayment(clientSecret, cardDetails, createWithCardParams)
   }
-  
-  confirmSetup(clientSecret: string, cardDetails: CardDetails): Promise<SetupIntentResult>{
-    const nativeSetupIntentResult = StripePayments.confirmSetup(clientSecret, cardDetails);
+
+  async confirmSetup(clientSecret: string, cardDetails: CardDetails): Promise<SetupIntentResult>{
+    const nativeSetupIntentResult = await StripePayments.confirmSetup(clientSecret, cardDetails);
     const cardNumber = cardDetails.number;
     const cardType = creditCardType(cardNumber);
     let brand = "";
