@@ -49,6 +49,7 @@ android {
         targetSdkVersion safeExtGet('targetSdkVersion', DEFAULT_TARGET_SDK_VERSION)
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     lintOptions {
         abortOnError false
@@ -74,6 +75,7 @@ dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
     implementation 'com.stripe:stripe-android:14.2.1'
+    implementation 'com.android.support:multidex:1.0.3'
 }
 
 def configureReactNativePom(def pom) {
