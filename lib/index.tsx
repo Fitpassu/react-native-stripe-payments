@@ -1,4 +1,5 @@
 import { NativeModules } from 'react-native';
+import creditCardType from 'credit-card-type';
 
 const { StripePayments } = NativeModules;
 
@@ -17,10 +18,13 @@ export interface PaymentResult {
   id: string,
   paymentMethodId: string,
 }
+
 export interface SetupIntentResult {
-  id: string,
   paymentMethodId: string,
-  liveMode: boolean
+  liveMode: boolean,
+  last4: string,
+  created: number,
+  brand: string
 }
 
 class Stripe {
@@ -35,8 +39,20 @@ class Stripe {
   confirmPayment(clientSecret: string, cardDetails: CardDetails, createWithCardParams: boolean): Promise<PaymentResult> {
     return StripePayments.confirmPayment(clientSecret, cardDetails, createWithCardParams)
   }
+  
   confirmSetup(clientSecret: string, cardDetails: CardDetails): Promise<SetupIntentResult>{
-    return StripePayments.confirmSetup(clientSecret, cardDetails)
+    const nativeSetupIntentResult = StripePayments.confirmSetup(clientSecret, cardDetails);
+    const cardNumber = cardDetails.number;
+    const cardType = creditCardType(cardNumber);
+    let brand = "";
+    if (cardType.length > 0) {
+      brand = cardType[0].type;
+    }
+
+    return {
+      ...nativeSetupIntentResult,
+      brand
+    }
   }
 
   isCardValid(cardDetails: CardDetails): boolean {
