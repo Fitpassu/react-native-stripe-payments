@@ -24,65 +24,62 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(isCardValid:(NSDictionary *)cardParams)
 
 RCT_EXPORT_METHOD(confirmSetup:(NSString *)clientSecret cardParams:(NSDictionary *)cardParams resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-//    if (cardParams.email
-//        && cardParams.number
-//        && cardParams.expMonth
-//        && cardParams.expYear
-//        && cardParams.cardCvc
-//        && cardParams.postalCode
-//        && clientSecret)
-//    {
-        // Collect card params
-        STPCardParams *card = [[STPCardParams alloc] init];
-        card.number = [RCTConvert NSString:cardParams[@"number"]];
-        card.expYear = [[RCTConvert NSNumber:cardParams[@"expYear"]] unsignedIntegerValue];
-        card.expMonth = [[RCTConvert NSNumber:cardParams[@"expMonth"]] unsignedIntegerValue];
-        card.cvc = [RCTConvert NSString:cardParams[@"cvc"]];
-        
-        // Collect the customer's email to know which customer the PaymentMethod belongs to
-        STPPaymentMethodBillingDetails *billingDetails = [[STPPaymentMethodBillingDetails alloc] init];
-        billingDetails.email = [RCTConvert NSString:cardParams[@"email"]];
-        billingDetails.address.postalCode = [RCTConvert NSString:cardParams[@"postalCode"]];
-        
-        // Create SetupIntent confirm parameters with the above
-        STPPaymentMethodCardParams *paymentMethodCardParams =[[STPPaymentMethodCardParams alloc] initWithCardSourceParams:card];
-        STPPaymentMethodParams *paymentMethodParams = [STPPaymentMethodParams paramsWithCard:paymentMethodCardParams billingDetails:billingDetails metadata:nil];
-        STPSetupIntentConfirmParams *setupIntentConfirmParams = [[STPSetupIntentConfirmParams alloc] initWithClientSecret:clientSecret];
-        setupIntentConfirmParams.paymentMethodParams = paymentMethodParams;
-        
-        // Submit payment intent
-        STPPaymentHandler *paymentHandler = [STPPaymentHandler sharedHandler];
-        [paymentHandler confirmSetupIntent:setupIntentConfirmParams withAuthenticationContext:self completion:^(STPPaymentHandlerActionStatus status, STPSetupIntent *setupIntent, NSError *error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                switch (status) {
-                    case STPPaymentHandlerActionStatusFailed: {
-                        reject(@"StripeModule.failed", error.localizedDescription, nil);
-                        break;
-                    }
-                    case STPPaymentHandlerActionStatusCanceled: {
-                        reject(@"StripeModule.cancelled", @"", nil);
-                        break;
-                    }
-                    case STPPaymentHandlerActionStatusSucceeded: {
-                        resolve(@{
-                            @"id": [setupIntent paymentMethodID],
-                            @"customer": [setupIntent customerID],
-                            @"liveMode": @([setupIntent livemode]),
-                            @"last4": [[paymentMethodParams card] last4],
-                            @"exp_month": [[paymentMethodParams card] expMonth],
-                            @"exp_year": [[paymentMethodParams card] expYear]
-                        });
-                        break;
-                    }
-                    default:
-                        reject(@"StripeModule.unknown", error.localizedDescription, nil);
-                        break;
-                }
-            });
-        }];
-//    } else {
-//        reject(@"StripeModule.failed", @"Insufficient card parameters", nil);
-//    }
+
+      // Collect card params
+      STPCardParams *card = [[STPCardParams alloc] init];
+      card.number = [RCTConvert NSString:cardParams[@"number"]];
+      card.expYear = [[RCTConvert NSNumber:cardParams[@"exp_year"]] unsignedIntegerValue];
+      card.expMonth = [[RCTConvert NSNumber:cardParams[@"exp_month"]] unsignedIntegerValue];
+      card.cvc = [RCTConvert NSString:cardParams[@"cvc"]];
+      RCTLogInfo(@"Message: %@", card);
+
+      // Collect the customer's email to know which customer the PaymentMethod belongs to
+      STPPaymentMethodBillingDetails *billingDetails = [[STPPaymentMethodBillingDetails alloc] init];
+      billingDetails.email = [RCTConvert NSString:cardParams[@"email"]];
+      billingDetails.address.postalCode = [RCTConvert NSString:cardParams[@"postalCode"]];
+      
+      // Create SetupIntent confirm parameters with the above
+      STPPaymentMethodCardParams *paymentMethodCardParams =[[STPPaymentMethodCardParams alloc] initWithCardSourceParams:card];
+      STPPaymentMethodParams *paymentMethodParams = [STPPaymentMethodParams paramsWithCard:paymentMethodCardParams billingDetails:billingDetails metadata:nil];
+      STPSetupIntentConfirmParams *setupIntentConfirmParams = [[STPSetupIntentConfirmParams alloc] initWithClientSecret:clientSecret];
+      setupIntentConfirmParams.paymentMethodParams = paymentMethodParams;
+      
+      // Submit payment intent
+      STPPaymentHandler *paymentHandler = [STPPaymentHandler sharedHandler];
+      [paymentHandler confirmSetupIntent:setupIntentConfirmParams withAuthenticationContext:self completion:^(STPPaymentHandlerActionStatus status, STPSetupIntent *setupIntent, NSError *error) {
+          dispatch_async(dispatch_get_main_queue(), ^{
+              switch (status) {
+                  case STPPaymentHandlerActionStatusFailed: {
+                      reject(@"StripeModule.failed", error.localizedDescription, nil);
+                      break;
+                  }
+                  case STPPaymentHandlerActionStatusCanceled: {
+                      reject(@"StripeModule.cancelled", @"", nil);
+                      break;
+                  }
+                  case STPPaymentHandlerActionStatusSucceeded: {
+                      NSString *customerID = [setupIntent customerID];
+                      if (!customerID) {
+                        customerID = [NSString string];
+                      }
+                      
+                      resolve(@{
+                          @"id": [setupIntent paymentMethodID],
+                          @"exp_month": [[paymentMethodParams card] expMonth],
+                          @"exp_year": [[paymentMethodParams card] expYear],
+                          @"last4": [[paymentMethodParams card] last4],
+                          @"created": [NSNumber numberWithDouble:[[setupIntent created] timeIntervalSince1970]],
+                          @"liveMode": @([setupIntent livemode]),
+                      });
+                      break;
+                  }
+                  default:
+                      reject(@"StripeModule.unknown", error.localizedDescription, nil);
+                      break;
+              }
+          });
+      }];
+
 }
 
 RCT_EXPORT_METHOD(confirmPayment:(NSString *)secret cardParams:(NSDictionary *)cardParams resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
