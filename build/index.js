@@ -60,8 +60,11 @@ var Stripe = /** @class */ (function () {
             _this._stripeInitialized = true;
         };
     }
-    Stripe.prototype.confirmPayment = function (clientSecret, cardParams, createWithCardParams) {
-        return StripePayments.confirmPayment(clientSecret, cardParams, createWithCardParams);
+    Stripe.prototype.confirmPaymentWithCardParams = function (clientSecret, cardParams) {
+        return StripePayments.confirmPaymentWithCardParams(clientSecret, cardParams);
+    };
+    Stripe.prototype.confirmPaymentWithPaymentMethodId = function (clientSecret, paymentMethodId) {
+        return StripePayments.confirmPaymentWithPaymentMethodId(clientSecret, paymentMethodId);
     };
     Stripe.prototype.confirmSetup = function (clientSecret, cardParams) {
         return __awaiter(this, void 0, void 0, function () {

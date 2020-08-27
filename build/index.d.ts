@@ -21,7 +21,8 @@ export interface SetupIntentResult {
 declare class Stripe {
     _stripeInitialized: boolean;
     setOptions: (options: InitParams) => void;
-    confirmPayment(clientSecret: string, cardParams: CardParams, createWithCardParams: boolean): Promise<PaymentResult>;
+    confirmPaymentWithCardParams(clientSecret: string, cardParams: CardParams): Promise<PaymentResult>;
+    confirmPaymentWithPaymentMethodId(clientSecret: string, paymentMethodId: string): Promise<PaymentResult>;
     confirmSetup(clientSecret: string, cardParams: CardParams): Promise<SetupIntentResult>;
     isCardValid(cardDetails: CardParams): boolean;
 }

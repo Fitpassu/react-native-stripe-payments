@@ -36,8 +36,12 @@ class Stripe {
     this._stripeInitialized = true;
   }
 
-  confirmPayment(clientSecret: string, cardParams: CardParams, createWithCardParams: boolean): Promise<PaymentResult> {
-    return StripePayments.confirmPayment(clientSecret, cardParams, createWithCardParams)
+  confirmPaymentWithCardParams(clientSecret: string, cardParams: CardParams): Promise<PaymentResult> {
+    return StripePayments.confirmPaymentWithCardParams(clientSecret, cardParams)
+  }
+
+  confirmPaymentWithPaymentMethodId(clientSecret: string, paymentMethodId: string): Promise<PaymentResult> {
+    return StripePayments.confirmPaymentWithPaymentMethodId(clientSecret, paymentMethodId);
   }
 
   async confirmSetup(clientSecret: string, cardParams: CardParams): Promise<SetupIntentResult>{
