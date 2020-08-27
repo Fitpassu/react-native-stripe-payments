@@ -103,7 +103,3 @@ stripe.confirmPaymentWithCardParams('client_secret_from_backend', cardParams)
     // error performing payment
   )
 ```
-
-### Reusing cards
-
-Not supported yet, though as we're highly invested in development of our product which depends on this library we'll do it as soon as possible!
