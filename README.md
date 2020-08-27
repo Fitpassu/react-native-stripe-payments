@@ -44,9 +44,9 @@ const isCardValid = stripe.isCardValid({
   cvc: '888',
 });
 ```
-The argument for isCardValid is of type `CardParams`, which is used across the other APIs.
+The argument for `isCardValid` is of type `CardParams`, which is used across the other APIs.
 
-### Set up a payment method for future payments using Setup Intent
+### Set up a payment method for future payments (Setup Intent)
 
 ```javascript
 stripe.confirmSetup('client_secret_from_backend', cardParams)
