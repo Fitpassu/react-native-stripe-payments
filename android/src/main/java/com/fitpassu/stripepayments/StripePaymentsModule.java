@@ -83,7 +83,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
 
     @ReactMethod(isBlockingSynchronousMethod =  true)
     public boolean isCardValid(ReadableMap cardParams) {
-        Card card =  new Card.Builder(
+        Card card = new Card.Builder(
                     cardParams.getString("number"),
                     cardParams.getInt("expMonth"),
                     cardParams.getInt("expYear"),
@@ -94,13 +94,13 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void confirmPayment(String secret, ReadableMap cardParams, boolean createCardWithParams, final Promise promise) {
+    public void confirmPaymentWithCardParams(String secret, ReadableMap cardParams, final Promise promise) {
         current = "Payment";
         stripe = new Stripe(
                 reactContext,
                 PaymentConfiguration.getInstance(reactContext).getPublishableKey()
         );
-        if(createCardWithParams){
+
         PaymentMethodCreateParams.Card card = new PaymentMethodCreateParams.Card(
                 cardParams.getString("number"),
                 cardParams.getInt("expMonth"),
@@ -120,22 +120,29 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
         paymentPromise = promise;
         
         stripe.confirmPayment(getCurrentActivity(), confirmParams);
-        }else{
+    }
 
-        if (cardParams.getString("payment_method") == null) {
+    @ReactMethod
+    public void confirmPaymentWithPaymentMethodId(String secret, String paymentMethodId, final Promise promise) {
+        current = "Payment";
+        stripe = new Stripe(
+                reactContext,
+                PaymentConfiguration.getInstance(reactContext).getPublishableKey()
+        );
+
+        if (paymentMethodId == null) {
             promise.reject("", "StripeModule.invalidPaymentIntentParams");
             return;
         }
         paymentPromise = promise;
 
-            stripe.confirmPayment(
+        stripe.confirmPayment(
             getCurrentActivity(),
             ConfirmPaymentIntentParams.createWithPaymentMethodId(
-                cardParams.getString("payment_method"),
+                paymentMethodId,
                 secret
-                )
-            );
-        }
+            )
+        );
     }
 
     private static final class PaymentResultCallback implements ApiResultCallback<PaymentIntentResult> {
