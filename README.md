@@ -20,21 +20,23 @@ The library ships with platform native code that needs to be compiled together w
 
 ## Usage
 
-### Setup
-
-First of all you have to obtain Stripe account [publishabe key](https://stripe.com/docs/keys). And then you need to set it for module.
+To use the module, import it first.
 
 ```javascript
 import stripe from 'react-native-stripe-payments';
+```
 
+### Setup
+
+First of all you have to obtain a Stripe account [publishable key](https://stripe.com/docs/keys), which you need to set it for the module.
+
+```javascript
 stripe.setOptions({ publishingKey: 'STRIPE_PUBLISHING_KEY' });
 ```
 
 ### Validate the given card details
 
 ```javascript
-import stripe from 'react-native-stripe-payments';
-
 const isCardValid = stripe.isCardValid({
   number: '4242424242424242',
   expMonth: 10,
@@ -42,27 +44,62 @@ const isCardValid = stripe.isCardValid({
   cvc: '888',
 });
 ```
+The argument for `isCardValid` is of type `CardParams`, which is used across the other APIs.
 
-### One-time payments
+### Set up a payment method for future payments (Setup Intent)
 
 ```javascript
-import stripe from 'react-native-stripe-payments';
+stripe.confirmSetup('client_secret_from_backend', cardParams)
+  .then(result => {
+    // result of type SetupIntentResult
+    // {
+    //    paymentMethodId,
+    //    liveMode,
+    //    last4,
+    //    created,
+    //    brand
+    // }
+  })
+  .catch(err =>
+    // error performing payment
+  )
+```
+The `brand` is the provider of the card, and we use the [module](https://www.npmjs.com/package/credit-card-type) `credit-card-type` to achieve that. 
 
-const cardDetails = {
-  number: '4242424242424242',
-  expMonth: 10,
-  expYear: 21,
-  cvc: '888',
-}
-stripe.confirmPayment('client_secret_from_backend', cardDetails)
+### One-time payment using the `id` of a `PaymentMethod`
+
+```javascript
+stripe.confirmPaymentWithPaymentMethodId('client_secret_from_backend', paymentMethodId)
   .then(result => {
     // result of type PaymentResult
+    // {
+    //    id,
+    //    paymentMethodId
+    // }
   })
   .catch(err =>
     // error performing payment
   )
 ```
 
-### Reusing cards
+### One-time payment using `cardParams`
 
-Not supported yet, though as we're highly invested in development of our product which depends on this library we'll do it as soon as possible!
+```javascript
+const cardDetails = {
+  number: '4242424242424242',
+  expMonth: 10,
+  expYear: 21,
+  cvc: '888',
+}
+stripe.confirmPaymentWithCardParams('client_secret_from_backend', cardParams)
+  .then(result => {
+    // result of type PaymentResult
+    // {
+    //    id,
+    //    paymentMethodId
+    // }
+  })
+  .catch(err =>
+    // error performing payment
+  )
+```
