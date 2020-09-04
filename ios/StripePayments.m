@@ -65,9 +65,6 @@ RCT_EXPORT_METHOD(confirmSetup:(NSString *)clientSecret cardParams:(NSDictionary
                     
                     resolve(@{
                         @"id": [setupIntent paymentMethodID],
-                        @"exp_month": [[paymentMethodParams card] expMonth],
-                        @"exp_year": [[paymentMethodParams card] expYear],
-                        @"last4": [[paymentMethodParams card] last4],
                         @"created": [NSNumber numberWithDouble:[[setupIntent created] timeIntervalSince1970]],
                         @"liveMode": @([setupIntent livemode]),
                     });
