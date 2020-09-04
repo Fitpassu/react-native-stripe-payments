@@ -229,8 +229,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
                     status == SetupIntent.Status.Processing
             ) {
                 WritableMap map = Arguments.createMap();
-                map.putString("id", setupIntent.getId());
-                map.putString("paymentMethodId", setupIntent.getPaymentMethodId());
+                map.putString("id", setupIntent.getPaymentMethodId());
                 promise.resolve(map);
             } else if (status == SetupIntent.Status.Canceled) {
                 promise.reject("StripeModule.cancelled", "");
