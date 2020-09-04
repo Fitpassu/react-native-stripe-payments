@@ -58,7 +58,6 @@ class Stripe {
       exp_month: cardParams.expMonth,
       exp_year: cardParams.expYear,
       last4: cardNumber.substr(cardNumber.length - 4),
-      created: cardParams.number,
       brand: brand,
       ...nativeSetupIntentResult      
     }
