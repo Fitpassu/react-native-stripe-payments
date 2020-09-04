@@ -28,8 +28,8 @@ RCT_EXPORT_METHOD(confirmSetup:(NSString *)clientSecret cardParams:(NSDictionary
     // Collect card params
     STPCardParams *card = [[STPCardParams alloc] init];
     card.number = [RCTConvert NSString:cardParams[@"number"]];
-    card.expYear = [[RCTConvert NSNumber:cardParams[@"exp_year"]] unsignedIntegerValue];
-    card.expMonth = [[RCTConvert NSNumber:cardParams[@"exp_month"]] unsignedIntegerValue];
+    card.expYear = [[RCTConvert NSNumber:cardParams[@"expYear"]] unsignedIntegerValue];
+    card.expMonth = [[RCTConvert NSNumber:cardParams[@"expMonth"]] unsignedIntegerValue];
     card.cvc = [RCTConvert NSString:cardParams[@"cvc"]];
     RCTLogInfo(@"Message: %@", card);
 
