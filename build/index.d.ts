@@ -12,7 +12,9 @@ export interface PaymentResult {
     paymentMethodId: string;
 }
 export interface SetupIntentResult {
-    paymentMethodId: string;
+    id: string;
+    exp_month: string;
+    exp_year: string;
     liveMode: boolean;
     last4: string;
     created: number;
