@@ -80,7 +80,7 @@ var Stripe = /** @class */ (function () {
                         if (cardType.length > 0) {
                             brand = cardType[0].type;
                         }
-                        setupIntentResult = __assign({ exp_month: cardParams.expMonth, exp_year: cardParams.expYear, last4: cardNumber.substr(cardNumber.length - 4), created: cardParams.number, brand: brand }, nativeSetupIntentResult);
+                        setupIntentResult = __assign({ exp_month: cardParams.expMonth, exp_year: cardParams.expYear, last4: cardNumber.substr(cardNumber.length - 4), brand: brand }, nativeSetupIntentResult);
                         return [2 /*return*/, setupIntentResult];
                 }
             });
