@@ -82,6 +82,7 @@ var Stripe = /** @class */ (function () {
                         }
                         delete cardParams['cvc'];
                         delete cardParams['number'];
+                        cardParams['last4'] = cardNumber.substr(cardNumber.length - 4);
                         return [2 /*return*/, __assign(__assign(__assign({}, nativeSetupIntentResult), cardParams), { brand: brand })];
                 }
             });
