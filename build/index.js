@@ -68,7 +68,7 @@ var Stripe = /** @class */ (function () {
     };
     Stripe.prototype.confirmSetup = function (clientSecret, cardParams) {
         return __awaiter(this, void 0, void 0, function () {
-            var nativeSetupIntentResult, cardNumber, cardType, brand;
+            var nativeSetupIntentResult, cardNumber, cardType, brand, setupIntentResult;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, StripePayments.confirmSetup(clientSecret, cardParams)];
@@ -80,10 +80,8 @@ var Stripe = /** @class */ (function () {
                         if (cardType.length > 0) {
                             brand = cardType[0].type;
                         }
-                        delete cardParams['cvc'];
-                        delete cardParams['number'];
-                        cardParams['last4'] = cardNumber.substr(cardNumber.length - 4);
-                        return [2 /*return*/, __assign(__assign(__assign({}, nativeSetupIntentResult), cardParams), { brand: brand })];
+                        setupIntentResult = __assign({ exp_month: cardParams.expMonth, exp_year: cardParams.expYear, last4: cardNumber.substr(cardNumber.length - 4), created: cardParams.number, brand: brand }, nativeSetupIntentResult);
+                        return [2 /*return*/, setupIntentResult];
                 }
             });
         });
