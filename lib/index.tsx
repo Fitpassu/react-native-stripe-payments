@@ -54,14 +54,15 @@ class Stripe {
     if (cardType.length > 0) {
       brand = cardType[0].type;
     }
-    delete cardParams['cvc']
-    delete cardParams['number']
-    cardParams['last4'] = cardNumber.substr(cardNumber.length - 4); 
-    return {
-      ...nativeSetupIntentResult,
-      ...cardParams,
-      brand
+    let setupIntentResult = {
+      exp_month: cardParams.expMonth,
+      exp_year: cardParams.expYear,
+      last4: cardNumber.substr(cardNumber.length - 4),
+      created: cardParams.number,
+      brand: brand,
+      ...nativeSetupIntentResult      
     }
+    return setupIntentResult
   }
 
   isCardValid(cardDetails: CardParams): boolean {
