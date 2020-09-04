@@ -15,7 +15,7 @@ export interface SetupIntentResult {
     id: string;
     exp_month: string;
     exp_year: string;
-    liveMode: boolean;
+    live_mode: boolean;
     last4: string;
     created: number;
     brand: string;
