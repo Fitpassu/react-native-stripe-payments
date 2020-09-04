@@ -182,8 +182,8 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
         current = "Setup";
         PaymentMethodCreateParams.Card card = new PaymentMethodCreateParams.Card(
                 cardParams.getString("number"),
-                cardParams.getInt("exp_month"),
-                cardParams.getInt("exp_year"),
+                cardParams.getInt("expMonth"),
+                cardParams.getInt("expYear"),
                 cardParams.getString("cvc"),
                 null,
                 null
