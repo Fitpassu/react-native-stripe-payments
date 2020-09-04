@@ -20,7 +20,9 @@ export interface PaymentResult {
 }
 
 export interface SetupIntentResult {
-  paymentMethodId: string,
+  id: string,
+  exp_month: string,
+  exp_year: string,
   liveMode: boolean,
   last4: string,
   created: number,
@@ -52,9 +54,11 @@ class Stripe {
     if (cardType.length > 0) {
       brand = cardType[0].type;
     }
-
+    delete cardParams['cvc']
+    delete cardParams['number']
     return {
       ...nativeSetupIntentResult,
+      ...cardParams,
       brand
     }
   }

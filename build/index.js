@@ -80,7 +80,9 @@ var Stripe = /** @class */ (function () {
                         if (cardType.length > 0) {
                             brand = cardType[0].type;
                         }
-                        return [2 /*return*/, __assign(__assign({}, nativeSetupIntentResult), { brand: brand })];
+                        delete cardParams['cvc'];
+                        delete cardParams['number'];
+                        return [2 /*return*/, __assign(__assign(__assign({}, nativeSetupIntentResult), cardParams), { brand: brand })];
                 }
             });
         });
