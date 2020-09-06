@@ -1,6 +1,6 @@
 ![React Native Stripe payments](https://raw.githubusercontent.com/Fitpassu/react-native-stripe-payments/master/react-native-stripe-payments.png)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 A well typed React Native library providing support for Stripe payments on both iOS and Android.
@@ -117,6 +117,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="http://www.lukebrandonfarrell.com"><img src="https://avatars3.githubusercontent.com/u/18139277?v=4" width="100px;" alt=""/><br /><sub><b>Luke Brandon Farrell</b></sub></a><br /><a href="https://github.com/aspect-apps/react-native-stripe-payments/commits?author=lukebrandonfarrell" title="Code">💻</a> <a href="#infra-lukebrandonfarrell" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#projectManagement-lukebrandonfarrell" title="Project Management">📆</a></td>
+    <td align="center"><a href="https://github.com/ChesterSim"><img src="https://avatars2.githubusercontent.com/u/12388321?v=4" width="100px;" alt=""/><br /><sub><b>Chester Sim</b></sub></a><br /><a href="https://github.com/aspect-apps/react-native-stripe-payments/commits?author=ChesterSim" title="Documentation">📖</a> <a href="https://github.com/aspect-apps/react-native-stripe-payments/commits?author=ChesterSim" title="Code">💻</a></td>
   </tr>
 </table>
 
