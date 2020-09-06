@@ -15,6 +15,16 @@
         "infra",
         "projectManagement"
       ]
+    },
+    {
+      "login": "ChesterSim",
+      "name": "Chester Sim",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/12388321?v=4",
+      "profile": "https://github.com/ChesterSim",
+      "contributions": [
+        "doc",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
