@@ -1,5 +1,9 @@
 import { NativeModules } from 'react-native';
 import creditCardType from 'credit-card-type';
+import {
+  NativeEventEmitter,
+  EmitterSubscription,
+} from "react-native";
 
 const { StripePayments } = NativeModules;
 
@@ -29,12 +33,17 @@ export interface SetupIntentResult {
   brand: string
 }
 
+export type createEphemeralKeyCallback = (apiVersion: string) => string;
+
 class Stripe {
   _stripeInitialized = false
+  eventEmitter: NativeEventEmitter;
+  ephemeralKeyListener?: EmitterSubscription;
 
   setOptions = (options: InitParams) => {
     if (this._stripeInitialized) { return; }
     StripePayments.init(options.publishingKey);
+    this.eventEmitter = new NativeEventEmitter(StripePayments);
     this._stripeInitialized = true;
   }
 
@@ -66,6 +75,33 @@ class Stripe {
 
   isCardValid(cardDetails: CardParams): boolean {
     return StripePayments.isCardValid(cardDetails) == true;
+  }
+
+  /***
+   *
+   * Customer session management
+   *
+   */
+  initCustomerSession(createEphemeralKey: createEphemeralKeyCallback) {
+    //we communicate with the native side with events, as that is the only way to be able
+    //to call the callback multiple times (each time the ephemeral key expires)
+    this.ephemeralKeyListener = this.eventEmitter.addListener(
+      "CreateStripeEphemeralKey",
+      (apiVersion: string) => {
+        const rawKey = createEphemeralKey(apiVersion);
+        StripePayments.onEphemeralKeyUpdate(rawKey);
+      }
+    );
+
+    //this will internally call the CreateStripeEphemeralKey every time when needed
+    return StripePayments.initCustomerSession();
+  }
+
+  endCustomerSession() {
+    if (this.ephemeralKeyListener) {
+      this.ephemeralKeyListener.remove(); //Removes the listener
+    }
+    return StripePayments.endCustomerSession();
   }
 }
 
