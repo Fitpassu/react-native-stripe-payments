@@ -23,6 +23,7 @@ import com.stripe.android.model.Card;
 import com.stripe.android.model.ConfirmPaymentIntentParams;
 import com.stripe.android.model.PaymentIntent;
 import com.stripe.android.model.PaymentMethodCreateParams;
+import com.stripe.android.CustomerSession;
 
 import com.stripe.android.model.SetupIntent;
 import com.stripe.android.SetupIntentResult;
@@ -33,6 +34,7 @@ import com.stripe.android.model.PaymentMethod.BillingDetails;
 public class StripePaymentsModule extends ReactContextBaseJavaModule {
 
     private static ReactApplicationContext reactContext;
+    private BridgeEphemeralKeyProvider ephemeralKeyProvider;
 
     private Stripe stripe;
     private Promise paymentPromise, setupPromise;
@@ -66,6 +68,8 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
         context.addActivityEventListener(activityListener);
 
         reactContext = context;
+
+        this.ephemeralKeyProvider = new BridgeEphemeralKeyProvider(reactContext);
     }
 
     @Override
@@ -243,5 +247,26 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
         public void onError(Exception e) {
             promise.reject("StripeModule.failed", e.toString());
         }
+    }
+
+    @ReactMethod
+    public void onEphemeralKeyUpdate(String rawKey) {
+        this.ephemeralKeyProvider.onKeyUpdate(rawKey);
+    }
+
+    @ReactMethod
+    public void onEphemeralKeyUpdateFailure(Integer responseCode,String message) {
+        this.ephemeralKeyProvider.onKeyUpdateFailure(responseCode, message);
+    }
+
+
+    @ReactMethod
+    public void initCustomerSession() {
+        CustomerSession.initCustomerSession(reactContext, this.ephemeralKeyProvider);
+    }
+
+    @ReactMethod
+    public void endCustomerSession() {
+        CustomerSession.endCustomerSession();
     }
 }

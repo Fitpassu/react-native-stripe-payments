@@ -74,7 +74,7 @@ repositories {
 dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
-    implementation 'com.stripe:stripe-android:14.2.1'
+    implementation 'com.stripe:stripe-android:15.1.0'
     implementation 'com.android.support:multidex:1.0.3'
 }
 
