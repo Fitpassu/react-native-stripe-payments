@@ -33,7 +33,9 @@ export interface SetupIntentResult {
   brand: string
 }
 
-export type createEphemeralKeyCallback = (apiVersion: string) => string;
+export type createEphemeralKeyCallback = (
+  apiVersion: string
+) => Promise<string>;
 
 class Stripe {
   _stripeInitialized = false
@@ -83,18 +85,40 @@ class Stripe {
    *
    */
   initCustomerSession(createEphemeralKey: createEphemeralKeyCallback) {
+    invariant(this.eventEmitter, "Stripe SDK is not initialized");
+
+    //we already have a listner setup, so remove it
+    //this can happen especially during dev when certain UI components refresh
+    if (this.ephemeralKeyListener) {
+      console.log("remove prev listener");
+      this.ephemeralKeyListener.remove();
+    }
+
     //we communicate with the native side with events, as that is the only way to be able
     //to call the callback multiple times (each time the ephemeral key expires)
     this.ephemeralKeyListener = this.eventEmitter.addListener(
       "CreateStripeEphemeralKey",
-      (apiVersion: string) => {
-        const rawKey = createEphemeralKey(apiVersion);
-        StripePayments.onEphemeralKeyUpdate(rawKey);
+      async (apiVersion: string) => {
+        try {
+          const rawKey = await createEphemeralKey(apiVersion);
+          console.log("generated key", rawKey);
+          StripePayments.onEphemeralKeyUpdate(rawKey);
+        } catch (e) {
+          console.log("generated key failed", e.code, e.message);
+          StripePayments.onEphemeralKeyUpdateFailure(
+            0,
+            e?.message ?? "UNKOWN ERROR"
+          );
+        }
       }
     );
 
     //this will internally call the CreateStripeEphemeralKey every time when needed
     return StripePayments.initCustomerSession();
+  }
+
+  presentPaymentMethodSelection() {
+    return StripePayments.presentPaymentMethodSelection();
   }
 
   endCustomerSession() {

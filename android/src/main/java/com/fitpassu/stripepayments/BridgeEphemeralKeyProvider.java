@@ -7,6 +7,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.UiThreadUtil;
 
 
 /** 
@@ -46,10 +47,20 @@ public class BridgeEphemeralKeyProvider implements EphemeralKeyProvider, Ephemer
      *
      */
     @Override
-    public void onKeyUpdate(String stripeResponseJson){
+    public void onKeyUpdate(final String stripeResponseJson){
         if(this.pendingKeyUpdateListener != null) {
-            this.pendingKeyUpdateListener.onKeyUpdate(stripeResponseJson);
-            this.pendingKeyUpdateListener = null; //release the memory. the listener is not used anymore
+            final EphemeralKeyUpdateListener keyUpdateListener = pendingKeyUpdateListener;
+
+            //
+            // we need to make sure the listener is updated on the UI thread
+            //
+            UiThreadUtil.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    keyUpdateListener.onKeyUpdate(stripeResponseJson);
+                }});
+
+            this.pendingKeyUpdateListener = null; //avoid memory leaks. the listener is not used anymore
         }
     }
 
@@ -60,10 +71,20 @@ public class BridgeEphemeralKeyProvider implements EphemeralKeyProvider, Ephemer
      *
      */
     @Override
-    public void onKeyUpdateFailure(int responseCode, String message) {
+    public void onKeyUpdateFailure(final int responseCode, final String message) {
         if(this.pendingKeyUpdateListener != null) {
-            this.pendingKeyUpdateListener.onKeyUpdateFailure(responseCode, message);
-            this.pendingKeyUpdateListener = null; //release the memory. the listener is not used anymore
+            final EphemeralKeyUpdateListener keyUpdateListener = pendingKeyUpdateListener;
+
+            //
+            // we need to make sure the listener is updated on the UI thread
+            //
+            UiThreadUtil.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    keyUpdateListener.onKeyUpdateFailure(responseCode, message);
+                }});
+
+            this.pendingKeyUpdateListener = null; //avoid memory leaks. the listener is not used anymore
         }
     }
 }

@@ -4,6 +4,7 @@ import java.lang.String;
 
 import android.app.Activity;
 import android.content.Intent;
+import androidx.activity.ComponentActivity;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -13,6 +14,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.BaseActivityEventListener;
+import com.facebook.react.bridge.UiThreadUtil;
 
 import com.facebook.react.bridge.WritableMap;
 import com.stripe.android.ApiResultCallback;
@@ -24,6 +26,9 @@ import com.stripe.android.model.ConfirmPaymentIntentParams;
 import com.stripe.android.model.PaymentIntent;
 import com.stripe.android.model.PaymentMethodCreateParams;
 import com.stripe.android.CustomerSession;
+import com.stripe.android.PaymentSession;
+import com.stripe.android.PaymentSessionConfig;
+import com.stripe.android.PaymentSessionData;
 
 import com.stripe.android.model.SetupIntent;
 import com.stripe.android.SetupIntentResult;
@@ -255,7 +260,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void onEphemeralKeyUpdateFailure(Integer responseCode,String message) {
+    public void onEphemeralKeyUpdateFailure(Integer responseCode, String message) {
         this.ephemeralKeyProvider.onKeyUpdateFailure(responseCode, message);
     }
 
@@ -263,6 +268,65 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void initCustomerSession() {
         CustomerSession.initCustomerSession(reactContext, this.ephemeralKeyProvider);
+    }
+
+    @ReactMethod
+    public void presentPaymentMethodSelection() {
+
+        //
+        //
+        //
+        UiThreadUtil.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                final PaymentSession paymentSession = new PaymentSession(
+                    (ComponentActivity) getCurrentActivity(),
+                    new PaymentSessionConfig.Builder()
+
+                    // collect shipping information
+                    .setShippingInfoRequired(false)
+
+                    // collect shipping method
+                    .setShippingMethodsRequired(false)
+
+                    .build()
+                );
+
+                paymentSession.init(
+                    new PaymentSession.PaymentSessionListener() {
+                        @Override
+                        public void onCommunicatingStateChanged(
+                            boolean isCommunicating
+                        ) {
+                            // update UI, such as hiding or showing a progress bar
+                        }
+
+                        @Override
+                        public void onError(
+                            int errorCode,
+                            String errorMessage
+                        ) {
+                            // handle error
+                        }
+
+                        @Override
+                        public void onPaymentSessionDataChanged(
+                            PaymentSessionData data
+                        ) {
+                            final PaymentMethod paymentMethod = data.getPaymentMethod();
+                            // use paymentMethod
+                        }
+                    }
+                );
+
+                //TODO: add payment method types as param
+                //TODO: show the amount, so people can remember what they are going to pay
+                paymentSession.setCartTotal(14.3);
+
+                paymentSession.presentPaymentMethodSelection(null);
+            }
+        });
     }
 
     @ReactMethod
