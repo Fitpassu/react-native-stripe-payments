@@ -114,9 +114,9 @@ class Stripe {
     //to call the callback multiple times (each time the ephemeral key expires)
     this.ephemeralKeyListener = this.eventEmitter.addListener(
       "CreateStripeEphemeralKey",
-      async (apiVersion: string) => {
+      async (event: { apiVersion: string }) => {
         try {
-          const rawKey = await createEphemeralKey(apiVersion);
+          const rawKey = await createEphemeralKey(event.apiVersion);
           invariant(rawKey, "EphemeralKey cannot be null"); //doing it here provides a better dev experience (as you see the red box) instead of a complete crash if we let the native side get it
           StripePayments.onEphemeralKeyUpdate(rawKey);
         } catch (e) {
