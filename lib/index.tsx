@@ -107,7 +107,6 @@ class Stripe {
     //we already have a listner setup, so remove it
     //this can happen especially during dev when certain UI components refresh
     if (this.ephemeralKeyListener) {
-      console.log("remove prev listener");
       this.ephemeralKeyListener.remove();
     }
 
@@ -118,10 +117,9 @@ class Stripe {
       async (apiVersion: string) => {
         try {
           const rawKey = await createEphemeralKey(apiVersion);
-          console.log("generated key", rawKey);
+          invariant(rawKey, "EphemeralKey cannot be null"); //doing it here provides a better dev experience (as you see the red box) instead of a complete crash if we let the native side get it
           StripePayments.onEphemeralKeyUpdate(rawKey);
         } catch (e) {
-          console.log("generated key failed", e.code, e.message);
           StripePayments.onEphemeralKeyUpdateFailure(
             0,
             e?.message ?? "UNKOWN ERROR"
