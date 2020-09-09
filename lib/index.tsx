@@ -37,6 +37,23 @@ export type createEphemeralKeyCallback = (
   apiVersion: string
 ) => Promise<string>;
 
+export enum PaymentMethodType {
+  Alipay = "Alipay",
+  AuBecsDebit = "AuBecsDebit",
+  BacsDebit = "BacsDebit",
+  Bancontact = "Bancontact",
+  Card = "Card",
+  CardPresent = "CardPresent",
+  Eps = "Eps",
+  Fpx = "Fpx",
+  Giropay = "Giropay",
+  Ideal = "Ideal",
+  Oxxo = "Oxxo",
+  P24 = "P24",
+  SepaDebit = "SepaDebit",
+  Sofort = "Sofort",
+}
+
 class Stripe {
   _stripeInitialized = false
   eventEmitter: NativeEventEmitter;
@@ -117,8 +134,18 @@ class Stripe {
     return StripePayments.initCustomerSession();
   }
 
-  presentPaymentMethodSelection() {
-    return StripePayments.presentPaymentMethodSelection();
+  /**
+   *
+   * According to this
+   * https://github.com/stripe/stripe-android/blob/master/stripe/src/main/java/com/stripe/android/view/PaymentMethodsAdapter.kt#L78
+   * The only payment methods supported by the basic integration is currently Card, Fpx
+   *
+   * @param paymentMethodTypes
+   */
+  presentPaymentMethodSelection(
+    paymentMethodTypes: (PaymentMethodType.Card | PaymentMethodType.Fpx)[]
+  ) {
+    return StripePayments.presentPaymentMethodSelection(paymentMethodTypes);
   }
 
   endCustomerSession() {

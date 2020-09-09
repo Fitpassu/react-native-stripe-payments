@@ -1,6 +1,11 @@
 package com.fitpassu.stripepayments;
 
 import java.lang.String;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,6 +17,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.UiThreadUtil;
@@ -254,6 +260,19 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @Override
+    public Map<String, Object> getConstants() {
+        final Map<String, Object> constants = new HashMap<>();
+        constants.put("PaymentMethod", Collections.unmodifiableMap(new HashMap<String, Object>() {
+            {
+                for (PaymentMethod.Type type : PaymentMethod.Type.values()) {
+                    put(type.code, type.name());
+                }
+            }
+        }));
+        return constants;
+    }
+
     @ReactMethod
     public void onEphemeralKeyUpdate(String rawKey) {
         this.ephemeralKeyProvider.onKeyUpdate(rawKey);
@@ -271,7 +290,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void presentPaymentMethodSelection() {
+    public void presentPaymentMethodSelection(final ReadableArray paymentMethodTypes) {
 
         //
         //
@@ -280,17 +299,28 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
             @Override
             public void run() {
 
-                final PaymentSession paymentSession = new PaymentSession(
-                    (ComponentActivity) getCurrentActivity(),
-                    new PaymentSessionConfig.Builder()
-
+                PaymentSessionConfig.Builder config = new PaymentSessionConfig.Builder()
+                
                     // collect shipping information
                     .setShippingInfoRequired(false)
 
                     // collect shipping method
-                    .setShippingMethodsRequired(false)
+                    .setShippingMethodsRequired(false);
 
-                    .build()
+
+                //convert the JS enum to Stripe SDK enums
+                if (paymentMethodTypes != null) {
+                    List<PaymentMethod.Type> result = new ArrayList<PaymentMethod.Type>(paymentMethodTypes.size());
+                    for (int i = 0; i < paymentMethodTypes.size(); i++) {
+                        result.add(PaymentMethod.Type.valueOf(paymentMethodTypes.getString(i)));
+                    }
+
+                    config.setPaymentMethodTypes(result);
+                }
+
+                PaymentSession paymentSession = new PaymentSession(
+                    (ComponentActivity) getCurrentActivity(),
+                    config.build()
                 );
 
                 paymentSession.init(
@@ -319,10 +349,6 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
                         }
                     }
                 );
-
-                //TODO: add payment method types as param
-                //TODO: show the amount, so people can remember what they are going to pay
-                paymentSession.setCartTotal(14.3);
 
                 paymentSession.presentPaymentMethodSelection(null);
             }
