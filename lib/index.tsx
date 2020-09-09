@@ -118,7 +118,9 @@ class Stripe {
         try {
           const rawKey = await createEphemeralKey(event.apiVersion);
           invariant(rawKey, "EphemeralKey cannot be null"); //doing it here provides a better dev experience (as you see the red box) instead of a complete crash if we let the native side get it
-          StripePayments.onEphemeralKeyUpdate(rawKey);
+          StripePayments.onEphemeralKeyUpdate(
+            typeof rawKey === "string" ? rawKey : JSON.stringify(rawKey)
+          );
         } catch (e) {
           StripePayments.onEphemeralKeyUpdateFailure(
             0,
