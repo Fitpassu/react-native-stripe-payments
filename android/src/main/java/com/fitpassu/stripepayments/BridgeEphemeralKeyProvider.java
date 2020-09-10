@@ -38,7 +38,7 @@ public class BridgeEphemeralKeyProvider implements EphemeralKeyProvider, Ephemer
         //async call the JS land
         reactContext
             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-            .emit("CreateStripeEphemeralKey", params);
+            .emit("StripeModule.createEphemeralKey", params);
     }
 
     /**
