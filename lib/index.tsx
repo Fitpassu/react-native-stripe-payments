@@ -113,14 +113,19 @@ class Stripe {
     //we communicate with the native side with events, as that is the only way to be able
     //to call the callback multiple times (each time the ephemeral key expires)
     this.ephemeralKeyListener = this.eventEmitter.addListener(
-      "CreateStripeEphemeralKey",
+      "StripeModule.createEphemeralKey",
       async (event: { apiVersion: string }) => {
         try {
           const rawKey = await createEphemeralKey(event.apiVersion);
-          invariant(rawKey, "EphemeralKey cannot be null"); //doing it here provides a better dev experience (as you see the red box) instead of a complete crash if we let the native side get it
-          StripePayments.onEphemeralKeyUpdate(
-            typeof rawKey === "string" ? rawKey : JSON.stringify(rawKey)
+          //while we use typescript and such errors will be determined at compile time
+          //if somebody is using the module in JS, the app will simply crash, so
+          //provide a better dev experience (as you see the red box)
+          invariant(rawKey, "EphemeralKey cannot be null");
+          invariant(
+            typeof rawKey === "string",
+            "EphemeralKey needs to be a string"
           );
+          StripePayments.onEphemeralKeyUpdate(rawKey);
         } catch (e) {
           StripePayments.onEphemeralKeyUpdateFailure(
             0,
