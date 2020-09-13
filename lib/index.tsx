@@ -179,8 +179,8 @@ class Stripe {
    *
    * @param paymentMethodTypes
    */
-  presentPaymentMethodSelection() {
-    return StripePayments.presentPaymentMethodSelection();
+  presentPaymentMethodSelection(paymentMethodId: string | null = null) {
+    return StripePayments.presentPaymentMethodSelection(paymentMethodId);
   }
 
   /**
