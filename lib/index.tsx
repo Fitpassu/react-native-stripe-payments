@@ -4,6 +4,7 @@ import {
   NativeEventEmitter,
   EmitterSubscription,
 } from "react-native";
+import invariant from "invariant";
 
 const { StripePayments } = NativeModules;
 
@@ -54,15 +55,32 @@ export enum PaymentMethodType {
   Sofort = "Sofort",
 }
 
-class Stripe {
-  _stripeInitialized = false
+/* Partial implementation (Card only / for now) */
+export interface PaymentMethod {
+  id: string;
+  created: number;
+  liveMode: boolean;
+  card?: {
+    brandDisplayName: string;
+    expiryMonth: number;
+    expiryYear: number;
+    funding: string;
+    last4: string;
+  };
+}
+
+class Stripe extends NativeEventEmitter {
+  constructor() {
+    super(StripePayments);
+  }
+
+  _stripeInitialized = false;
   eventEmitter: NativeEventEmitter;
   ephemeralKeyListener?: EmitterSubscription;
 
   setOptions = (options: InitParams) => {
     if (this._stripeInitialized) { return; }
     StripePayments.init(options.publishingKey);
-    this.eventEmitter = new NativeEventEmitter(StripePayments);
     this._stripeInitialized = true;
   }
 
@@ -141,16 +159,36 @@ class Stripe {
 
   /**
    *
+   * Start a payment session for the customer session
+   * @param paymentMethodTypes
+   */
+  createPaymentSession(
+    paymentMethodTypes: (PaymentMethodType.Card | PaymentMethodType.Fpx)[] = []
+  ) {
+    return StripePayments.createPaymentSession(paymentMethodTypes);
+  }
+
+  /**
+   *
    * According to this
    * https://github.com/stripe/stripe-android/blob/master/stripe/src/main/java/com/stripe/android/view/PaymentMethodsAdapter.kt#L78
    * The only payment methods supported by the basic integration is currently Card, Fpx
    *
    * @param paymentMethodTypes
    */
-  presentPaymentMethodSelection(
-    paymentMethodTypes: (PaymentMethodType.Card | PaymentMethodType.Fpx)[]
+  presentPaymentMethodSelection() {
+    return StripePayments.presentPaymentMethodSelection();
+  }
+
+  /**
+   *
+   *
+   * @param paymentMethodTypes
+   */
+  addPaymentMethod(
+    paymentMethodType: PaymentMethodType.Card | PaymentMethodType.Fpx
   ) {
-    return StripePayments.presentPaymentMethodSelection(paymentMethodTypes);
+    return StripePayments.addPaymentMethod(paymentMethodType);
   }
 
   endCustomerSession() {
@@ -161,4 +199,6 @@ class Stripe {
   }
 }
 
-export default new Stripe();
+const stripe = new Stripe(); //helps with autocomplete in VS Code
+
+export default stripe;
