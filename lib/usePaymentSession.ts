@@ -11,14 +11,12 @@ export default function usePaymentSession() {
 
   useEffect(() => {
     //create a listener for paymentMethod
-    const listener = stripe.addListener(
-      "StripeModule.PaymentSession.onPaymentMethodSelected",
-      setPaymentMethod
-    );
+    stripe.addListener("stripePaymentMethodSelected", setPaymentMethod);
 
     stripe.createPaymentSession();
 
-    return listener.remove; //when ui is destroyed, stop listening anymore to this session
+    return () =>
+      stripe.removeListener("stripePaymentMethodSelected", setPaymentMethod); //when ui is destroyed, stop listening anymore to this session
   }, []);
 
   return paymentMethod;

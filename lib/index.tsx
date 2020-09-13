@@ -69,11 +69,16 @@ export interface PaymentMethod {
   };
 }
 
-class Stripe extends NativeEventEmitter {
-  constructor() {
-    super(StripePayments);
-  }
+//inspired from the Keyboard module
+//https://github.com/facebook/react-native/blob/master/Libraries/Components/Keyboard/Keyboard.js
+const eventEmitter = new NativeEventEmitter(NativeModules.StripePayments);
 
+export type StripeEventName =
+  | "stripeCreateEphemeralKey"
+  | "stripePaymentMethodSelected";
+export type StripeEvent = "";
+
+class Stripe {
   _stripeInitialized = false;
   eventEmitter: NativeEventEmitter;
   ephemeralKeyListener?: EmitterSubscription;
@@ -120,8 +125,6 @@ class Stripe extends NativeEventEmitter {
    *
    */
   initCustomerSession(createEphemeralKey: createEphemeralKeyCallback) {
-    invariant(this.eventEmitter, "Stripe SDK is not initialized");
-
     //we already have a listner setup, so remove it
     //this can happen especially during dev when certain UI components refresh
     if (this.ephemeralKeyListener) {
@@ -130,8 +133,8 @@ class Stripe extends NativeEventEmitter {
 
     //we communicate with the native side with events, as that is the only way to be able
     //to call the callback multiple times (each time the ephemeral key expires)
-    this.ephemeralKeyListener = this.eventEmitter.addListener(
-      "StripeModule.createEphemeralKey",
+    this.ephemeralKeyListener = eventEmitter.addListener(
+      "stripeCreateEphemeralKey",
       async (event: { apiVersion: string }) => {
         try {
           const rawKey = await createEphemeralKey(event.apiVersion);
@@ -196,6 +199,28 @@ class Stripe extends NativeEventEmitter {
       this.ephemeralKeyListener.remove(); //Removes the listener
     }
     return StripePayments.endCustomerSession();
+  }
+
+  /**
+   * Event Listeners
+   */
+  addListener(
+    eventName: "stripePaymentMethodSelected",
+    callback: (paymentMethod: PaymentMethod) => void
+  ): void; //while the native eventEmitter does return a EventSubscription, calling remove on it durin unmount will fail. This is how all @react-native-community/hooks work
+  addListener(eventName: StripeEventName, callback: (e: any) => void) {
+    return eventEmitter.addListener(eventName, callback);
+  }
+
+  /**
+   *
+   */
+  removeListener(
+    eventName: "stripePaymentMethodSelected",
+    callback: (paymentMethod: PaymentMethod) => void
+  ): void;
+  removeListener(eventName: StripeEventName, callback: (e: any) => void) {
+    return eventEmitter.removeListener(eventName, callback);
   }
 }
 
