@@ -189,8 +189,10 @@ class Stripe {
    * @param paymentMethodTypes
    */
   addPaymentMethod(
-    paymentMethodType: PaymentMethodType.Card | PaymentMethodType.Fpx
-  ) {
+    paymentMethodType:
+      | PaymentMethodType.Card
+      | PaymentMethodType.Fpx = PaymentMethodType.Card
+  ): Promise<PaymentMethod> {
     return StripePayments.addPaymentMethod(paymentMethodType);
   }
 

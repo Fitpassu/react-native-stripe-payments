@@ -41,34 +41,69 @@ import com.stripe.android.SetupIntentResult;
 import com.stripe.android.model.ConfirmSetupIntentParams;
 import com.stripe.android.model.PaymentMethod;
 import com.stripe.android.model.PaymentMethod.BillingDetails;
+import com.stripe.android.view.AddPaymentMethodActivityStarter;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+
+import android.util.Log;
 
 public class StripePaymentsModule extends ReactContextBaseJavaModule {
+    private static final String TAG = "StripePayments";
 
     private static ReactApplicationContext reactContext;
     private BridgeEphemeralKeyProvider ephemeralKeyProvider;
 
     private Stripe stripe;
-    private Promise paymentPromise, setupPromise;
-    private String current= " temp_val";
+    private Promise paymentPromise, setupPromise, addCardPromise;
+    private PaymentSession paymentSession;
     
-    boolean handled;
     private final ActivityEventListener activityListener = new BaseActivityEventListener() {
 
         @Override
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-            if ((paymentPromise == null && setupPromise == null) || stripe == null) {
-                super.onActivityResult(activity, requestCode, resultCode, data);
-                return;
-            }
-            
-            if(current.equals("Payment")){
-            handled = stripe.onPaymentResult(requestCode, data, new PaymentResultCallback(paymentPromise));
-            }else if(current.equals("Setup")){
-                 handled = stripe.onSetupResult(requestCode, data, new SetupResultCallback(setupPromise));
+            //
+            //Rewritten according to the official sample
+            //https://github.com/stripe-samples/sample-store-android/blob/5ab40e92dc9a2fb1881396dc5050e760d8e27c77/app/src/main/java/com/stripe/android/samplestore/PaymentActivity.kt#L151
+            //
+            super.onActivityResult(activity, requestCode, resultCode, data);
+
+            boolean isPaymentIntentResult = stripe != null && stripe.onPaymentResult(requestCode, data, new PaymentResultCallback(paymentPromise));
+            Log.d(TAG, "onActivityResult: isPaymentIntent=" + isPaymentIntentResult + " data:" + data.toString());
+            if(!isPaymentIntentResult) {
+                boolean isSetupIntentResult = stripe != null && stripe.onSetupResult(requestCode, data, new SetupResultCallback(setupPromise));
+                Log.d(TAG, "onActivityResult: isSetupIntentResult=" + isPaymentIntentResult + " data:" + data.toString());
+                if (!isSetupIntentResult && data != null && paymentSession != null) {
+                    paymentSession.handlePaymentData(requestCode, resultCode, data);
+                }
             }
 
-            if (!handled){
-                super.onActivityResult(activity, requestCode, resultCode, data);
+            /**
+             * handle the add payment results (if needed)
+             * see: https://github.com/stripe/stripe-android/blob/02f0a75b11143fb9618b482b6b0e2f9b28a9953f/stripe/src/main/java/com/stripe/android/view/PaymentMethodsActivity.kt#L174
+             */
+            if(requestCode == AddPaymentMethodActivityStarter.REQUEST_CODE && addCardPromise != null) {
+
+                AddPaymentMethodActivityStarter.Result result = AddPaymentMethodActivityStarter.Result.fromIntent(data);
+
+                if(result instanceof AddPaymentMethodActivityStarter.Result.Success) {
+
+                    AddPaymentMethodActivityStarter.Result.Success successResult = (AddPaymentMethodActivityStarter.Result.Success) result;
+
+                    WritableMap map = convertPaymentMethod(successResult.getPaymentMethod());
+
+                    addCardPromise.resolve(map);
+                } else if (result instanceof AddPaymentMethodActivityStarter.Result.Canceled) {
+                    addCardPromise.reject("StripeModule.cancelled", "");
+                } else if (result instanceof AddPaymentMethodActivityStarter.Result.Failure) {
+
+                    AddPaymentMethodActivityStarter.Result.Failure failureResult = (AddPaymentMethodActivityStarter.Result.Failure) result;
+
+                    addCardPromise.reject("StripeModule.failed", failureResult.getException().getMessage());
+                }
+                else {
+                    // no-op
+                }
+
+                addCardPromise = null; //release it
             }
         }
     };
@@ -85,7 +120,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
 
     @Override
     public String getName() {
-        return "StripePayments";
+        return TAG;
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
@@ -110,7 +145,6 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void confirmPaymentWithCardParams(String secret, ReadableMap cardParams, final Promise promise) {
-        current = "Payment";
         stripe = new Stripe(
                 reactContext,
                 PaymentConfiguration.getInstance(reactContext).getPublishableKey()
@@ -139,7 +173,6 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void confirmPaymentWithPaymentMethodId(String secret, String paymentMethodId, final Promise promise) {
-        current = "Payment";
         stripe = new Stripe(
                 reactContext,
                 PaymentConfiguration.getInstance(reactContext).getPublishableKey()
@@ -194,7 +227,6 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
     }
         @ReactMethod
     public void confirmSetup(String secret, ReadableMap cardParams, final Promise promise) {
-        current = "Setup";
         PaymentMethodCreateParams.Card card = new PaymentMethodCreateParams.Card(
                 cardParams.getString("number"),
                 cardParams.getInt("expMonth"),
@@ -290,10 +322,10 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void presentPaymentMethodSelection(final ReadableArray paymentMethodTypes) {
+    public void createPaymentSession(final ReadableArray paymentMethodTypes) {
 
         //
-        //
+        // Stripe Payment Session Listeners work only on the main thread
         //
         UiThreadUtil.runOnUiThread(new Runnable() {
             @Override
@@ -318,7 +350,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
                     config.setPaymentMethodTypes(result);
                 }
 
-                PaymentSession paymentSession = new PaymentSession(
+                paymentSession = new PaymentSession(
                     (ComponentActivity) getCurrentActivity(),
                     config.build()
                 );
@@ -343,20 +375,89 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
                         @Override
                         public void onPaymentSessionDataChanged(
                             PaymentSessionData data
-                        ) {
-                            final PaymentMethod paymentMethod = data.getPaymentMethod();
-                            // use paymentMethod
+                        ) { 
+                            if (data.isPaymentReadyToCharge()) {
+                                final PaymentMethod paymentMethod = data.getPaymentMethod();
+
+                                WritableMap map = convertPaymentMethod(paymentMethod);
+
+                                 //async call the JS land
+                                reactContext
+                                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                                    .emit("stripePaymentMethodSelected", map);
+                            }
                         }
                     }
                 );
-
-                paymentSession.presentPaymentMethodSelection(null);
             }
         });
     }
 
     @ReactMethod
+    public void presentPaymentMethodSelection(final String paymentMethodId, final Promise promise) {
+
+        //
+        // Stripe Payment Session Listeners work only on the main thread
+        //
+        UiThreadUtil.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                paymentSession.presentPaymentMethodSelection(paymentMethodId);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void addPaymentMethod(String paymentMethodType, final Promise promise) {
+
+        addCardPromise = promise;
+        new AddPaymentMethodActivityStarter(getCurrentActivity())
+            .startForResult(new AddPaymentMethodActivityStarter.Args.Builder()
+                .setPaymentMethodType(PaymentMethod.Type.valueOf(paymentMethodType))
+                .setShouldAttachToCustomer(true)
+                .setAddPaymentMethodFooter(R.layout.stripe_add_payment_method_footer) //just in case somebody wants to add a footer
+
+                //TODO: make the footer an enum: "other_payment_methods" | "none"
+                .build()
+            );
+
+        //after the start, capture the other button and listen to it
+        //https://developer.android.com/guide/topics/ui/controls/button
+
+//        promise.reject('cancel')
+    }
+
+    @ReactMethod
     public void endCustomerSession() {
         CustomerSession.endCustomerSession();
+    }
+
+    /**
+     * 
+     * Convert a payment method to a JS object so it can be sent across the bridge
+     * 
+     */
+    protected WritableMap convertPaymentMethod(PaymentMethod paymentMethod) {
+
+        //finish the promise;
+        WritableMap map = Arguments.createMap();
+        map.putString("id", paymentMethod.id);
+        map.putDouble("created", paymentMethod.created);
+        map.putBoolean("liveMode", paymentMethod.liveMode);
+
+        if(paymentMethod.card != null) {
+
+            WritableMap cardMap = Arguments.createMap();
+            cardMap.putString("brand", paymentMethod.card.brand.getDisplayName()); //mimic the stripe.js model https://stripe.com/docs/api/cards/object#card_object-brand
+            cardMap.putInt("expiryMonth",  paymentMethod.card.expiryMonth);
+            cardMap.putInt("expiryYear", paymentMethod.card.expiryYear);
+            cardMap.putString("funding", paymentMethod.card.funding);
+            cardMap.putString("last4", paymentMethod.card.last4);
+
+            map.putMap("card", cardMap);
+        }
+
+        return map;
     }
 }
