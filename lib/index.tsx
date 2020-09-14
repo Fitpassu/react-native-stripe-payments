@@ -69,6 +69,8 @@ export interface PaymentMethod {
   };
 }
 
+export const STRIPE_CANCELLED_ERROR_CODE = "StripeModule.cancelled";
+
 //inspired from the Keyboard module
 //https://github.com/facebook/react-native/blob/master/Libraries/Components/Keyboard/Keyboard.js
 const eventEmitter = new NativeEventEmitter(NativeModules.StripePayments);

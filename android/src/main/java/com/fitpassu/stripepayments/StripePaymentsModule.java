@@ -92,7 +92,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
 
                     addCardPromise.resolve(map);
                 } else if (result instanceof AddPaymentMethodActivityStarter.Result.Canceled) {
-                    addCardPromise.reject("StripeModule.cancelled", "");
+                    addCardPromise.reject("StripeModule.cancelled", "The user cancelled");
                 } else if (result instanceof AddPaymentMethodActivityStarter.Result.Failure) {
 
                     AddPaymentMethodActivityStarter.Result.Failure failureResult = (AddPaymentMethodActivityStarter.Result.Failure) result;
@@ -423,11 +423,6 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
                 //TODO: make the footer an enum: "other_payment_methods" | "none"
                 .build()
             );
-
-        //after the start, capture the other button and listen to it
-        //https://developer.android.com/guide/topics/ui/controls/button
-
-//        promise.reject('cancel')
     }
 
     @ReactMethod
