@@ -446,7 +446,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
         if(paymentMethod.card != null) {
 
             WritableMap cardMap = Arguments.createMap();
-            cardMap.putString("brand", paymentMethod.card.brand.getDisplayName()); //mimic the stripe.js model https://stripe.com/docs/api/cards/object#card_object-brand
+            cardMap.putString("brand", paymentMethod.card.brand.getCode()); //mimic the stripe.js model https://stripe.com/docs/api/cards/object#card_object-brand
             cardMap.putInt("expiryMonth",  paymentMethod.card.expiryMonth);
             cardMap.putInt("expiryYear", paymentMethod.card.expiryYear);
             cardMap.putString("funding", paymentMethod.card.funding);
