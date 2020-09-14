@@ -347,7 +347,9 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
                         result.add(PaymentMethod.Type.valueOf(paymentMethodTypes.getString(i)));
                     }
 
-                    config.setPaymentMethodTypes(result);
+                    //TODO: if we set this, then on the fragment there won't be an +Add card option anymore
+                    //investigate why that is and fix the bug
+                    //config.setPaymentMethodTypes(result);
                 }
 
                 paymentSession = new PaymentSession(
