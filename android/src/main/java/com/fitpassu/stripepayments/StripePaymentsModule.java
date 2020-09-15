@@ -418,9 +418,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
             .startForResult(new AddPaymentMethodActivityStarter.Args.Builder()
                 .setPaymentMethodType(PaymentMethod.Type.valueOf(paymentMethodType))
                 .setShouldAttachToCustomer(true)
-                .setAddPaymentMethodFooter(R.layout.stripe_add_payment_method_footer) //just in case somebody wants to add a footer
 
-                //TODO: make the footer an enum: "other_payment_methods" | "none"
                 .build()
             );
     }
