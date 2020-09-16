@@ -1,4 +1,5 @@
 import { NativeModules } from 'react-native';
+import EventEmitter from "react-native/Libraries/vendor/emitter/EventEmitter";
 import creditCardType from 'credit-card-type';
 import {
   NativeEventEmitter,
@@ -73,7 +74,8 @@ export const STRIPE_CANCELLED_ERROR_CODE = "StripeModule.cancelled";
 
 //inspired from the Keyboard module
 //https://github.com/facebook/react-native/blob/master/Libraries/Components/Keyboard/Keyboard.js
-const eventEmitter = new NativeEventEmitter(NativeModules.StripePayments);
+//protect against people deciding to link only on platform from their react-native-config.js
+const eventEmitter = StripePayments ? new NativeEventEmitter(StripePayments) : new EventEmitter(); //fallback to a dummy implementation, so the app does not crash on these platforms
 
 export type StripeEventName =
   | "stripeCreateEphemeralKey"
@@ -82,7 +84,6 @@ export type StripeEvent = "";
 
 class Stripe {
   _stripeInitialized = false;
-  eventEmitter: NativeEventEmitter;
   ephemeralKeyListener?: EmitterSubscription;
 
   setOptions = (options: InitParams) => {
