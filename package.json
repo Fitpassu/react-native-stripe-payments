@@ -15,7 +15,6 @@
   "scripts": {
     "prepublish": "tsc",
     "build": "tsc",
-    "prepare": "yarn run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
