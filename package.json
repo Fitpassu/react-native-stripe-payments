@@ -3,12 +3,12 @@
   "title": "React Native Stripe Payments",
   "version": "1.0.4",
   "description": "Lightweight, easy to integrate and use React native library for Stripe payments (using Payment Intents) compliant with SCA (strong customer authentication).",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "lib/index.tsx",
+  "types": "lib/index.tsx",
   "files": [
     "README.md",
     "android",
-    "build/**/*",
+    "lib/**/*",
     "ios",
     "react-native-stripe-payments.podspec"
   ],
