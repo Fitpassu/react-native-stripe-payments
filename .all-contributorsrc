@@ -35,6 +35,15 @@
         "doc",
         "code"
       ]
+    },
+    {
+      "login": "rodriigovieira",
+      "name": "Rodrigo Vieira",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/7014073?v=4",
+      "profile": "https://github.com/rodriigovieira",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
