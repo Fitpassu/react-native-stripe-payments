@@ -67,10 +67,8 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
             super.onActivityResult(activity, requestCode, resultCode, data);
 
             boolean isPaymentIntentResult = stripe != null && stripe.onPaymentResult(requestCode, data, new PaymentResultCallback(paymentPromise));
-            Log.d(TAG, "onActivityResult: isPaymentIntent=" + isPaymentIntentResult + " data:" + data.toString());
             if(!isPaymentIntentResult) {
                 boolean isSetupIntentResult = stripe != null && stripe.onSetupResult(requestCode, data, new SetupResultCallback(setupPromise));
-                Log.d(TAG, "onActivityResult: isSetupIntentResult=" + isPaymentIntentResult + " data:" + data.toString());
                 if (!isSetupIntentResult && data != null && paymentSession != null) {
                     paymentSession.handlePaymentData(requestCode, resultCode, data);
                 }
