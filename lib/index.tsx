@@ -62,6 +62,7 @@ export interface PaymentMethod {
   created: number;
   liveMode: boolean;
   card?: {
+    brand: string;
     brandDisplayName: string;
     expiryMonth: number;
     expiryYear: number;
