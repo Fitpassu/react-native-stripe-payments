@@ -13,7 +13,6 @@
     "react-native-stripe-payments.podspec"
   ],
   "scripts": {
-    "prepublish": "tsc",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
