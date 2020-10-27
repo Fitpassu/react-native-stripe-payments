@@ -1,0 +1,55 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "lukebrandonfarrell",
+      "name": "Luke Brandon Farrell",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/18139277?v=4",
+      "profile": "http://www.lukebrandonfarrell.com",
+      "contributions": [
+        "code",
+        "infra",
+        "projectManagement"
+      ]
+    },
+    {
+      "login": "ChesterSim",
+      "name": "Chester Sim",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/12388321?v=4",
+      "profile": "https://github.com/ChesterSim",
+      "contributions": [
+        "doc",
+        "code"
+      ]
+    },
+    {
+      "login": "amogh-jrules",
+      "name": "Amogh Jahagirdar",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/31567169?v=4",
+      "profile": "https://jramogh.co",
+      "contributions": [
+        "doc",
+        "code"
+      ]
+    },
+    {
+      "login": "rodriigovieira",
+      "name": "Rodrigo Vieira",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/7014073?v=4",
+      "profile": "https://github.com/rodriigovieira",
+      "contributions": [
+        "bug"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "react-native-stripe-payments",
+  "projectOwner": "aspect-apps",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}

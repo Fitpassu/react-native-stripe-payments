@@ -1,4 +1,5 @@
 import { NativeModules } from 'react-native';
+import creditCardType from 'credit-card-type';
 
 const { StripePayments } = NativeModules;
 
@@ -6,7 +7,7 @@ export interface InitParams {
   publishingKey: string
 }
 
-export interface CardDetails {
+export interface CardParams {
   number: string,
   expMonth: number,
   expYear: number,
@@ -18,6 +19,16 @@ export interface PaymentResult {
   paymentMethodId: string,
 }
 
+export interface SetupIntentResult {
+  id: string,
+  exp_month: string,
+  exp_year: string,
+  live_mode: boolean,
+  last4: string,
+  created: number,
+  brand: string
+}
+
 class Stripe {
   _stripeInitialized = false
 
@@ -27,11 +38,33 @@ class Stripe {
     this._stripeInitialized = true;
   }
 
-  confirmPayment(clientSecret: string, cardDetails: CardDetails): Promise<PaymentResult> {
-    return StripePayments.confirmPayment(clientSecret, cardDetails)
+  confirmPaymentWithCardParams(clientSecret: string, cardParams: CardParams): Promise<PaymentResult> {
+    return StripePayments.confirmPaymentWithCardParams(clientSecret, cardParams)
   }
 
-  isCardValid(cardDetails: CardDetails): boolean {
+  confirmPaymentWithPaymentMethodId(clientSecret: string, paymentMethodId: string): Promise<PaymentResult> {
+    return StripePayments.confirmPaymentWithPaymentMethodId(clientSecret, paymentMethodId);
+  }
+
+  async confirmSetup(clientSecret: string, cardParams: CardParams): Promise<SetupIntentResult>{
+    const nativeSetupIntentResult = await StripePayments.confirmSetup(clientSecret, cardParams);
+    const cardNumber = cardParams.number;
+    const cardType = creditCardType(cardNumber);
+    let brand = "";
+    if (cardType.length > 0) {
+      brand = cardType[0].type;
+    }
+    let setupIntentResult = {
+      exp_month: cardParams.expMonth,
+      exp_year: cardParams.expYear,
+      last4: cardNumber.substr(cardNumber.length - 4),
+      brand: brand,
+      ...nativeSetupIntentResult      
+    }
+    return setupIntentResult
+  }
+
+  isCardValid(cardDetails: CardParams): boolean {
     return StripePayments.isCardValid(cardDetails) == true;
   }
 }
