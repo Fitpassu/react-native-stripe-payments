@@ -41,14 +41,14 @@
   "licenseFilename": "LICENSE",
   "readmeFilename": "README.md",
   "peerDependencies": {
-    "react": "^16.8.1",
-    "react-native": ">=0.60.0-rc.0 <1.0.x"
+    "react": "~16",
+    "react-native": "~0.63"
   },
   "devDependencies": {
-    "@types/react": "^16.9.0",
-    "@types/react-native": "^0.62.16",
-    "react": "^16.9.0",
-    "react-native": ">=0.60",
-    "typescript": "^3.9.6"
+    "@types/react": "~16",
+    "@types/react-native": "~0.63",
+    "react": "~16",
+    "react-native": "~0.63",
+    "typescript": "~3"
   }
 }
