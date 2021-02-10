@@ -22,8 +22,9 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(isCardValid:(NSDictionary *)cardParams)
     return [NSString stringWithFormat:@"%@", @(result)];
 }
 
-RCT_EXPORT_METHOD(confirmPayment:(NSString *)secret cardParams:(NSDictionary *)cardParams resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(confirmPayment:(NSString *)publishableKey secret:(NSString *)secret cardParams:(NSDictionary *)cardParams resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
+    [STPAPIClient sharedClient].publishableKey = publishableKey;
     // Collect card details
     STPPaymentMethodCardParams *card = [[STPPaymentMethodCardParams alloc] init];
     card.number = [RCTConvert NSString:cardParams[@"number"]];
