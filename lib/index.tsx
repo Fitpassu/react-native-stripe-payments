@@ -27,8 +27,8 @@ class Stripe {
     this._stripeInitialized = true;
   }
 
-  confirmPayment(clientSecret: string, cardDetails: CardDetails): Promise<PaymentResult> {
-    return StripePayments.confirmPayment(clientSecret, cardDetails)
+  confirmPayment(publishingKey:string, clientSecret: string, cardDetails: CardDetails): Promise<PaymentResult> {
+    return StripePayments.confirmPayment(publishingKey, clientSecret, cardDetails)
   }
 
   isCardValid(cardDetails: CardDetails): boolean {

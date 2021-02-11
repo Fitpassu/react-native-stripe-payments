@@ -78,7 +78,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void confirmPayment(String secret, ReadableMap cardParams, final Promise promise) {
+    public void confirmPayment(String publishableKey, String secret, ReadableMap cardParams, final Promise promise) {
         PaymentMethodCreateParams.Card card = new PaymentMethodCreateParams.Card(
                 cardParams.getString("number"),
                 cardParams.getInt("expMonth"),
@@ -98,7 +98,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
         paymentPromise = promise;
         stripe = new Stripe(
                 reactContext,
-                PaymentConfiguration.getInstance(reactContext).getPublishableKey()
+                publishableKey
         );
         stripe.confirmPayment(getCurrentActivity(), confirmParams);
     }
