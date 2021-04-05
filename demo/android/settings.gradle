@@ -7,3 +7,6 @@ apply from: file("../node_modules/@react-native-community/cli-platform-android/n
 applyNativeModulesSettingsGradle(settings)
 
 include ':app'
+
+include ':react-native-stripe-payments'
+project(':react-native-stripe-payments').projectDir = new File(rootProject.projectDir, '../../android')
