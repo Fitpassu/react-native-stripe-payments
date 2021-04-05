@@ -42,3 +42,4 @@ buck-out/
 *.keystore
 
 demo/ios/Pods/**
+demo/secrets.js
