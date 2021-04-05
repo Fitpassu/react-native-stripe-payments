@@ -66,3 +66,16 @@ stripe.confirmPayment('client_secret_from_backend', cardDetails)
 ### Reusing cards
 
 Not supported yet, though as we're highly invested in development of our product which depends on this library we'll do it as soon as possible!
+
+## Development and contribution
+
+### Demo app
+
+* To make it convenient to develop this library there is a React Native app `demo`.
+* Developed `react-native-stripe-payments` module is imported via `metro` JS bundler as extra node module.
+* If native code is changed demo app is required to be recompiled.
+* If `react-native-stripe-payments` typescript code is changed JS module need to be recompiled (just run `tsc` in root directory). Recompiled JS files are seen by metro and module is hot reloaded.
+
+### Demo server
+
+To start local web server which mocks server side behaviour execute `yarn server` from `demo` directory. 
