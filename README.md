@@ -18,6 +18,12 @@ This library provides simple way to integrate SCA compliant Stripe payments into
 
 The library ships with platform native code that needs to be compiled together with React Native. This requires you to configure your build tools which can be done with [autolinking](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md).
 
+### Additional iOS setup
+As Stripe SDK is now in Swift, the following changes must be done or the compilation will fail.
+
+1. Create a "Dummy" swift file (xcode -> open your project -> right click on the folder named after your project, where Info.plist resides -> new File -> Swift -> say <b>YES</b> when asked for the bridging header)
+2. Remove the swift-5.0 search path, or you will get an error about undefined symbols. Take a look here -> https://github.com/react-native-community/upgrade-support/issues/62#issuecomment-622985723
+
 ## Usage
 
 ### Setup
