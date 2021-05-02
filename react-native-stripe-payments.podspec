@@ -19,6 +19,5 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency "React"
-  s.dependency "Stripe", "~> 19.0"
+  s.dependency "Stripe", "~> 21.4.0"
 end
-
