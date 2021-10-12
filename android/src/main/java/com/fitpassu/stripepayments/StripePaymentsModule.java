@@ -114,6 +114,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
         public void onSuccess(PaymentIntentResult result) {
             PaymentIntent paymentIntent = result.getIntent();
             PaymentIntent.Status status = paymentIntent.getStatus();
+            String errorMessage = paymentIntent.getLastErrorMessage();
 
             if (
                     status == PaymentIntent.Status.Succeeded ||
@@ -126,7 +127,7 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
             } else if (status == PaymentIntent.Status.Canceled) {
                 promise.reject("StripeModule.cancelled", "");
             } else {
-                promise.reject("StripeModule.failed", status.toString());
+                promise.reject("StripeModule.failed", errorMessage);
             }
         }
 
