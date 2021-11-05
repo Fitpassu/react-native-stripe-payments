@@ -127,8 +127,6 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
                 promise.resolve(map);
             } else if (status == PaymentIntent.Status.Canceled) {
                 promise.reject("StripeModule.cancelled", "");
-            } else if (status == PaymentIntent.Status.RequiresPaymentMethod) {
-                promise.reject("StripeModule.requiresPaymentMethod", "");
             } else {
                 promise.reject("StripeModule.failed", errorMessage != null ? errorMessage : status.toString());
             }
