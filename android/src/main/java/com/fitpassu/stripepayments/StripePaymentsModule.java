@@ -118,7 +118,8 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
 
             if (
                     status == PaymentIntent.Status.Succeeded ||
-                    status == PaymentIntent.Status.Processing
+                    status == PaymentIntent.Status.Processing ||
+                    status == PaymentIntent.Status.RequiresCapture
             ) {
                 WritableMap map = Arguments.createMap();
                 map.putString("id", paymentIntent.getId());
@@ -126,8 +127,10 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
                 promise.resolve(map);
             } else if (status == PaymentIntent.Status.Canceled) {
                 promise.reject("StripeModule.cancelled", "");
+            } else if (status == PaymentIntent.Status.RequiresPaymentMethod) {
+                promise.reject("StripeModule.requiresPaymentMethod", "");
             } else {
-                promise.reject("StripeModule.failed", errorMessage);
+                promise.reject("StripeModule.failed", errorMessage != null ? errorMessage : status.toString());
             }
         }
 
