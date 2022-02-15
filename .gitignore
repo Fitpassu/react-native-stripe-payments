@@ -40,3 +40,6 @@ local.properties
 buck-out/
 \.buckd/
 *.keystore
+
+demo/ios/Pods/**
+demo/secrets.js
