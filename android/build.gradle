@@ -73,7 +73,7 @@ repositories {
 dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
-    implementation 'com.stripe:stripe-android:16.9.0'
+    implementation 'com.stripe:stripe-android:16.6.1'
 }
 
 def configureReactNativePom(def pom) {
