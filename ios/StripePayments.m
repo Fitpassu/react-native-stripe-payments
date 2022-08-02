@@ -42,7 +42,11 @@ RCT_EXPORT_METHOD(confirmPayment:(NSString *)publishableKey secret:(NSString *)s
         dispatch_async(dispatch_get_main_queue(), ^{
             switch (status) {
                 case STPPaymentHandlerActionStatusFailed: {
-                    reject(@"StripeModule.failed", error.localizedDescription, nil);
+                    if ([error.debugDescription rangeOfString:@"You cannot confirm this PaymentIntent because it has already succeeded after being previously confirmed."].location == NSNotFound) {
+                        reject(@"StripeModule.failed", error.localizedDescription, nil);
+                    } else {
+                        reject(@"StripeModule.failed", @"You cannot confirm this PaymentIntent because it has already succeeded after being previously confirmed.", nil);
+                    }
                     break;
                 }
                 case STPPaymentHandlerActionStatusCanceled: {
