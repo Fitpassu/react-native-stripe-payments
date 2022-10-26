@@ -36,19 +36,6 @@ import stripe from 'react-native-stripe-payments';
 stripe.setOptions({ publishingKey: 'STRIPE_PUBLISHING_KEY' });
 ```
 
-### Validate the given card details
-
-```javascript
-import stripe from 'react-native-stripe-payments';
-
-const isCardValid = stripe.isCardValid({
-  number: '4242424242424242',
-  expMonth: 10,
-  expYear: 21,
-  cvc: '888',
-});
-```
-
 ### One-time payments
 
 ```javascript

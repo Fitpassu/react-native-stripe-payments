@@ -11,17 +11,6 @@ RCT_EXPORT_METHOD(init:(NSString *)publishableKey)
     [StripeAPI setDefaultPublishableKey:publishableKey];
 }
 
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(isCardValid:(NSDictionary *)cardParams)
-{
-    STPCardParams *card = [[STPCardParams alloc] init];
-    card.number = [RCTConvert NSString:cardParams[@"number"]];
-    card.expYear = [[RCTConvert NSNumber:cardParams[@"expYear"]] unsignedIntegerValue];
-    card.expMonth = [[RCTConvert NSNumber:cardParams[@"expMonth"]] unsignedIntegerValue];
-    card.cvc = [RCTConvert NSString:cardParams[@"cvc"]];
-    BOOL result = ([STPCardValidator validationStateForCard:card] == STPCardValidationStateValid);
-    return [NSString stringWithFormat:@"%@", @(result)];
-}
-
 RCT_EXPORT_METHOD(confirmPayment:(NSString *)publishableKey secret:(NSString *)secret cardParams:(NSDictionary *)cardParams resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
     [STPAPIClient sharedClient].publishableKey = publishableKey;

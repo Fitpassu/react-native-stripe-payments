@@ -65,18 +65,6 @@ public class StripePaymentsModule extends ReactContextBaseJavaModule {
         );
     }
 
-    @ReactMethod(isBlockingSynchronousMethod =  true)
-    public boolean isCardValid(ReadableMap cardParams) {
-        Card card =  new Card.Builder(
-                    cardParams.getString("number"),
-                    cardParams.getInt("expMonth"),
-                    cardParams.getInt("expYear"),
-                    cardParams.getString("cvc")
-                )
-                .build();
-        return card.validateNumber() && card.validateExpiryDate() && card.validateExpMonth() && card.validateCVC();
-    }
-
     @ReactMethod
     public void confirmPayment(String publishableKey, String secret, ReadableMap cardParams, final Promise promise) {
         PaymentMethodCreateParams.Card card = new PaymentMethodCreateParams.Card(
