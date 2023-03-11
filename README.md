@@ -1,3 +1,7 @@
+# Important!
+
+We highly recommend using [official Stripe react native library](https://github.com/stripe/stripe-react-native). This library was created prior to the introduction of the official one and is currently not developed further. It's maintained to support current users but they're also encouraged to migrate to using the official library.
+
 ![React Native Stripe payments](https://raw.githubusercontent.com/Fitpassu/react-native-stripe-payments/master/react-native-stripe-payments.png)
 
 A well typed React Native library providing support for Stripe payments on both iOS and Android.
@@ -77,10 +81,7 @@ Not supported yet, though as we're highly invested in development of our product
 
 ### Demo app
 
-* To make it convenient to develop this library there is a React Native app `demo`.
-* Developed `react-native-stripe-payments` module is imported via `metro` JS bundler as extra node module.
-* If native code is changed demo app is required to be recompiled.
-* If `react-native-stripe-payments` typescript code is changed JS module need to be recompiled (just run `tsc` in root directory). Recompiled JS files are seen by metro and module is hot reloaded.
+_Unfortunately currently broken._
 
 ### Demo server
 
