@@ -15,8 +15,13 @@ class StripePayments: NSObject {
     }
 
     @objc(isCardValid:)
-    func isCardValid(cardParams: NSDictionary) -> Bool {
-        return true
+    func isCardValid(cardParams: NSDictionary) -> NSNumber {
+        let card = STPCardParams()
+        card.number = RCTConvert.nsString(cardParams["number"])
+        card.expYear = RCTConvert.nsuInteger(cardParams["expYear"])
+        card.expMonth = RCTConvert.nsuInteger(cardParams["expMonth"])
+        card.cvc = RCTConvert.nsString(cardParams["cvc"])
+        return NSNumber(booleanLiteral: STPCardValidator.validationState(forCard: card) == .valid)
     }
 
     @objc(confirmPayment:cardParams:resolver:rejecter:)

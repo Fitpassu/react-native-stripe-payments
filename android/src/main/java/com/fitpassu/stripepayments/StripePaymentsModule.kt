@@ -22,7 +22,15 @@ class StripePaymentsModule(
 
     @ReactMethod(isBlockingSynchronousMethod = true)
     fun isCardValid(cardParams: ReadableMap): Boolean {
-        return true
+        CardMultilineWidget(currentActivity!!).run {
+            setCardNumber(cardParams.getString("number"))
+            setCvcCode(cardParams.getString("cvc"))
+            setExpiryDate(
+                year = cardParams.getInt("expYear"),
+                month = cardParams.getInt("expMonth")
+            )
+            return validateAllFields()
+        }
     }
 
     @ReactMethod
